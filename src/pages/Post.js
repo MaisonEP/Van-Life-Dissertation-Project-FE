@@ -1,10 +1,9 @@
 import { View, Text } from "react-native";
 
-export default function Home({ navigation }) {
-  console.log(navigation);
+export default function Games({ navigation }) {
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>home!</Text>
+      <Text>Create Post!</Text>
     </View>
   );
 }
