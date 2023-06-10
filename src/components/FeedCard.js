@@ -9,7 +9,7 @@ const FeedCard = ({ publisherName, publisherLocation }) => {
   const [likesColour, setLikesColour] = useState(colours.black);
   return (
     <Surface
-      elevation={s}
+      elevation={6}
       category="medium"
       style={{
         ...postStyle.container,
