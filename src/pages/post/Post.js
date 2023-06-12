@@ -1,9 +1,9 @@
 import { View, Text } from "react-native";
 
-export default function Market({ navigation }) {
+export default function Post({ navigation }) {
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Market Page!</Text>
+      <Text>Create Post!</Text>
     </View>
   );
 }

@@ -28,9 +28,9 @@ const AppNavBar = ({ navigation }) => {
               )}
             />
             <IconButton
-              onPress={() => navigation.navigate("Market")}
+              onPress={() => navigation.navigate("Explore")}
               icon={(props) => (
-                <Icon name="store" size={props.size} color={"#FFFFFF"} />
+                <Icon name="map-marker" size={props.size} color={"#FFFFFF"} />
               )}
             />
             <IconButton
