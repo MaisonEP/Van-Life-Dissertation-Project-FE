@@ -19,6 +19,7 @@ export default function Home({ navigation }) {
               key={i}
               publisherName={userInfo.publisherName}
               publisherLocation={userInfo.publisherLocation}
+              navigation={navigation}
             ></FeedCard>
           );
         })}

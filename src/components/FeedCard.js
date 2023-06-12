@@ -1,12 +1,21 @@
 import { Surface, Avatar, IconButton } from "@react-native-material/core";
 import colours from "../styles/colours";
-import { View, Text, Dimensions, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Dimensions,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import { useState } from "react";
 
-const FeedCard = ({ publisherName, publisherLocation }) => {
+const FeedCard = ({ publisherName, publisherLocation, navigation }) => {
   const viewHeight = Dimensions.get("window").height / 3;
   const [likesColour, setLikesColour] = useState(colours.black);
+  const profileNavigate = () => {
+    navigation.navigate("UserProfiles");
+  };
   return (
     <Surface
       elevation={6}
@@ -21,12 +30,14 @@ const FeedCard = ({ publisherName, publisherLocation }) => {
         testID="here???????????????????????????????"
       >
         <View style={postStyle.displayPicture}>
-          <Avatar icon={(props) => <Icon name="account" {...props} />} />
+          <TouchableOpacity title="button" onPress={profileNavigate}>
+            <Avatar icon={(props) => <Icon name="account" {...props} />} />
+          </TouchableOpacity>
         </View>
         <View style={postStyle.usernameAndContent}>
           <View style={postStyle.UsernameContainer}>
             <Text>
-              {publisherName},{publisherLocation}
+              {publisherName}, {publisherLocation}
             </Text>
           </View>
           <View style={postStyle.contentBody}>
