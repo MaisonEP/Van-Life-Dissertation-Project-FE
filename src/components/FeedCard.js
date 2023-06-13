@@ -1,4 +1,9 @@
-import { Surface, Avatar, IconButton } from "@react-native-material/core";
+import {
+  Surface,
+  Avatar,
+  IconButton,
+  Divider,
+} from "@react-native-material/core";
 import colours from "../styles/colours";
 import {
   View,
@@ -15,6 +20,9 @@ const FeedCard = ({ publisherName, publisherLocation, navigation }) => {
   const [likesColour, setLikesColour] = useState(colours.black);
   const profileNavigate = () => {
     navigation.navigate("UserProfiles");
+  };
+  const commentNavigate = () => {
+    navigation.navigate("Comments");
   };
   return (
     <Surface
@@ -41,9 +49,15 @@ const FeedCard = ({ publisherName, publisherLocation, navigation }) => {
             </Text>
           </View>
           <View style={postStyle.contentBody}>
+            <Divider
+              style={{ marginTop: 1 }}
+              leadingInset={3}
+              trailingInset={3}
+            />
             <View style={postStyle.contentTitle}>
               <Text>Title</Text>
             </View>
+
             <View style={postStyle.contentText}>
               <Text>Content</Text>
             </View>
@@ -66,7 +80,7 @@ const FeedCard = ({ publisherName, publisherLocation, navigation }) => {
               <View style={postStyle.commentLayout}>
                 <Text>Comments </Text>
                 <IconButton
-                  onPress={() => navigation.navigate("comment")}
+                  onPress={() => navigation.navigate("Comments")}
                   icon={(props) => (
                     <Icon
                       name="comment"
@@ -99,11 +113,12 @@ const FeedCard = ({ publisherName, publisherLocation, navigation }) => {
 
 const postStyle = StyleSheet.create({
   container: {
-    backgroundColor: colours.Celeste + "70",
+    backgroundColor: colours.white,
     // justifyContent: "center",
     width: "100%",
     display: "flex",
     // justifyContent: "flex-start",
+    // padding: 10,
   },
   contentLayout: {
     flexDirection: "row",
@@ -122,10 +137,12 @@ const postStyle = StyleSheet.create({
   },
   UsernameContainer: {
     // backgroundColor: colours.Celeste,
-    paddingBottom: 20,
+    paddingBottom: 10,
+    paddingTop: 10,
   },
   contentTitle: {
     paddingBottom: 20,
+    paddingTop: 20,
   },
   contentText: {
     flexGrow: 2,
