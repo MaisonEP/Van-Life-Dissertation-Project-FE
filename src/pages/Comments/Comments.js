@@ -12,7 +12,7 @@ export default function UserProfiles({ navigation }) {
       style={commentSectionContainer.image}
     >
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>UserProfiles Page!</Text>
+        <Text>Comment section Page!</Text>
       </View>
     </ImageBackground>
   );
