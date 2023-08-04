@@ -1,0 +1,69 @@
+import {
+  TextInput,
+  IconButton,
+  Button,
+  Stack,
+} from "@react-native-material/core";
+import { StyleSheet } from "react-native";
+import colours from "../../styles/colours";
+import Icon from "@expo/vector-icons/MaterialCommunityIcons";
+import React, { useState } from "react";
+import { Surface } from "react-native-paper";
+import { View } from "react-native-web";
+import Text from "@react-native-material/core";
+
+export default function Register({}) {
+  const [username, setuserName] = useState("anil");
+  const [password, setPassword] = useState("password");
+
+  //to retrieve data: pass the response of your fetch cal through a function then return response.json. This retrieves the response of the api call then pass the data through the the function to retrieve it.
+  //fetch function allows the use of a url/api end point as a parameter to connect to your api client and dbms. it also takes other params like the abject containing method, body and headers.
+  //JSON object has a method called stringify which takes the object containing username and password.
+
+  const userCredentials = () => {
+    fetch("http://192.168.0.15:8080/accountdetails/username", {
+      method: "POST",
+      body: JSON.stringify({ userName: username, password: password }),
+      headers: { "Content-Type": "application/json" },
+    }).catch((error) => {
+      console.log("There was an error", error);
+    });
+  };
+  return (
+    <React.Fragment>
+      <Stack fill center spacing={4}>
+        <Surface
+          elevation={2}
+          category="medium"
+          style={{ width: "80%", height: "80%" }}
+        >
+          <TextInput
+            placeholder="Username"
+            variant="outlined"
+            trailing={(props) => <IconButton {...props} />}
+            onChangeText={(text) => {
+              setuserName(text);
+            }}
+          />
+          <TextInput
+            placeholder="Password"
+            variant="outlined"
+            trailing={(props) => <IconButton {...props} />}
+            onChangeText={(text) => {
+              setPassword(text);
+            }}
+          />
+          <Stack fill center spacing={1}>
+            <Button
+              variant="outlined"
+              title="Register"
+              color="#d4ac2d"
+              // the on press attribute takes a function which calls the function for executing the http protocol and posting user credentials to the database
+              onPress={() => userCredentials()}
+            />
+          </Stack>
+        </Surface>
+      </Stack>
+    </React.Fragment>
+  );
+}

@@ -1,10 +1,10 @@
 import { View, Text, TextInput, StyleSheet, Button, Image } from "react-native";
 import React, { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
-import Video from "react-native-video";
-import { ResizeMode, video } from "expo-av";
+// import Video from "react-native-video";
+// import { ResizeMode, video } from "expo-av";
 
-export default function Post({}) {
+export default function Post({ }) {
   const [image, setImage] = useState(null);
   const videoVar = React.useRef(null);
   const [video, setVideo] = React.useState({});

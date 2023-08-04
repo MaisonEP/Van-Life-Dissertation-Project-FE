@@ -14,6 +14,7 @@ import Profile from "./src/pages/profile/Profile";
 import Search from "./src/pages/search/Search";
 import Post from "./src/pages/post/Post";
 import Explore from "./src/pages/Explore/Explore";
+import Register from "./src/pages/Register/Register";
 import { NavigationContainer } from "@react-navigation/native";
 import AppNavBar from "./src/components/AppNavBar";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -21,6 +22,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import UserProfiles from "./src/pages/UserProfiles/UserProfiles";
 import { HeaderStyleInterpolators } from "@react-navigation/stack";
 import Comments from "./src/pages/Comments/Comments";
+import Login from "./src/pages/LoginPage/Login";
 
 const image = {
   uri: "https://cdn.pixabay.com/photo/2020/01/22/15/50/illustration-4785614_1280.png",
@@ -28,6 +30,7 @@ const image = {
 const Stack = createStackNavigator();
 const Tabs = createBottomTabNavigator();
 const headerStyle = HeaderStyleInterpolators;
+const Password = 1;
 const Test = () => {
   return (
     <View>
@@ -61,24 +64,40 @@ export default function App() {
   return (
     <NavigationContainer>
       <ImageBackground source={image} resizeMode="cover" style={appStyle.image}>
-        <Tabs.Navigator tabBar={(props) => <AppNavBar {...props}></AppNavBar>}>
-          <Tabs.Screen
-            name="HomeWrapper"
-            component={ScreenNavigator}
-            options={{ header: () => null }}
-          ></Tabs.Screen>
-          <Tabs.Screen
-            name="Profile"
-            component={Profile}
-            options={{
-              title: "My Profile",
-              HeaderStyleInterpolators: headerStyle.forUIKit,
-            }}
-          ></Tabs.Screen>
-          <Tabs.Screen name="Explore" component={Explore}></Tabs.Screen>
-          <Tabs.Screen name="Search" component={Search}></Tabs.Screen>
-          <Tabs.Screen name="Post" component={Post}></Tabs.Screen>
-        </Tabs.Navigator>
+        {/* to add if statements to HTML, instead of if(){} else{}, the syntax is {condition?():()} for example {var > 1?(code if condition is met):(semi colon represents else then these brackets hold other action)} */}
+        {/* HTML comments like this one are created between html tags. press control + forward slash */}
+        {Password > 1 ? (
+          <Tabs.Navigator
+            tabBar={(props) => <AppNavBar {...props}></AppNavBar>}
+          >
+            <Tabs.Screen
+              name="HomeWrapper"
+              component={ScreenNavigator}
+              options={{ header: () => null }}
+            ></Tabs.Screen>
+            <Tabs.Screen
+              name="Profile"
+              component={Profile}
+              options={{
+                title: "My Profile",
+                HeaderStyleInterpolators: headerStyle.forUIKit,
+              }}
+            ></Tabs.Screen>
+            <Tabs.Screen name="Explore" component={Explore}></Tabs.Screen>
+            <Tabs.Screen name="Search" component={Search}></Tabs.Screen>
+            <Tabs.Screen name="Post" component={Post}></Tabs.Screen>
+          </Tabs.Navigator>
+        ) : (
+          // because of curly braces creating a javascript contained area, the comment behaviour is java like
+          //to containe more than 1 tag within the if statement, it requires the empty tag (fragment) to contain all elemts of code, e.g. <></>
+          <Stack.Navigator
+            initialRouteName="Login"
+            screenOptions={{ cardStyle: appStyle.appBackground }}
+          >
+            <Stack.Screen name="Login" component={Login}></Stack.Screen>
+            <Stack.Screen name="Register" component={Register}></Stack.Screen>
+          </Stack.Navigator>
+        )}
       </ImageBackground>
     </NavigationContainer>
   );
