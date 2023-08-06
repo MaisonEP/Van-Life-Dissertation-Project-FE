@@ -10,13 +10,14 @@ import {
 import { StyleSheet } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { StatusBar } from "expo-status-bar";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import * as Location from "expo-location";
 import colours from "../../styles/colours";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import { ListItem, Divider } from "@react-native-material/core";
 import { Button } from "@react-native-material/core";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import LoginContext from "../../../LoginContext";
 
 export default function App() {
   const [location, setLocation] = useState();
@@ -24,6 +25,7 @@ export default function App() {
   const [showCategories, setShowCategories] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const context = useContext(LoginContext);
 
   const typesOfCategrories = {
     campsite: "Campsite",
@@ -86,6 +88,7 @@ export default function App() {
     })
       .then(() => {
         setShowCategories(false);
+        context.setRefetchingPosts(true);
       })
       .catch((error) => {
         console.log("There was an error", error);
