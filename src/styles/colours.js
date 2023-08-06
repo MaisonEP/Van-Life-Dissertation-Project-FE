@@ -6,6 +6,7 @@ const yellowGreen = "#a1f665";
 const white = "#ffffff";
 const black = "#000000";
 const dirtBrown = "#f9d597";
+const pistachio = "#e8fabe";
 
 export default {
   darkSlateGrey,
@@ -16,4 +17,5 @@ export default {
   white,
   black,
   dirtBrown,
+  pistachio,
 };

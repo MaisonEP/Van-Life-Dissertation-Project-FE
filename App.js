@@ -65,15 +65,17 @@ export default function App() {
   const [value, setValue] = useState(0);
   const [loggedIn, setLoggedIn] = useState(false);
   const [appLoading, setAppLoading] = useState(true);
+  const [refetchingPosts, setRefetchingPosts] = useState(true);
 
   const initialContext = {
     isLoggedIn: loggedIn,
     setLoggedIn: setLoggedIn,
+    refetchingPosts: refetchingPosts,
+    setRefetchingPosts: setRefetchingPosts,
   };
 
   useEffect(() => {
     const value = async () => {
-      await AsyncStorage.clear();
       const response = await AsyncStorage.getItem("loggedIn");
 
       setLoggedIn(response === "true" ? true : false);

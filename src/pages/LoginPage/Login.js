@@ -29,8 +29,10 @@ export default function Login({ navigation }) {
         return response.json();
       })
       .then(async (response) => {
-        await AsyncStorage.setItem("loggedIn", response.toString());
-        myGlobalValues.setLoggedIn(response);
+        await AsyncStorage.setItem("loggedIn", "true");
+        console.log(response.userId);
+        await AsyncStorage.setItem("userId", response.userId);
+        myGlobalValues.setLoggedIn(true);
       })
       .catch((error) => {
         console.log("There was an error", error);
