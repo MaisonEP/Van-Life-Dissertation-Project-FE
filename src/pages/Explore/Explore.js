@@ -2,10 +2,10 @@ import {
   View,
   TextInput,
   Dimensions,
-  Text,
   TouchableOpacity,
   LayoutAnimation,
-  AppState,
+  ActivityIndicator,
+  Text,
 } from "react-native";
 import { StyleSheet } from "react-native";
 import MapView, { Marker } from "react-native-maps";
@@ -14,12 +14,23 @@ import { useState, useEffect, useRef } from "react";
 import * as Location from "expo-location";
 import colours from "../../styles/colours";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
-import { ListItem } from "@react-native-material/core";
+import { ListItem, Divider } from "@react-native-material/core";
+import { Button } from "@react-native-material/core";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function App() {
   const [location, setLocation] = useState();
   const [address, setAddress] = useState();
   const [showCategories, setShowCategories] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  const typesOfCategrories = {
+    campsite: "Campsite",
+    landscape: "Landscape",
+    other: "Other",
+  };
+
   const categoriesRef = useRef();
 
   LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -33,7 +44,6 @@ export default function App() {
       try {
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
-          console.log("Please grant location permission");
           return;
         }
         const currentLocation = await Location.getCurrentPositionAsync({});
@@ -41,8 +51,7 @@ export default function App() {
           latitude: currentLocation.coords.latitude,
           longitude: currentLocation.coords.longitude,
         });
-        console.log("Location");
-        console.log(currentLocation);
+        setIsLoading(false);
       } catch (error) {
         console.log("This is the error" + error);
       }
@@ -53,12 +62,41 @@ export default function App() {
   const geocode = async () => {
     try {
       const geocodedLocation = await Location.geocodeAsync(address);
-      console.log(geocodedLocation);
     } catch (error) {
       console.log("My seccond error" + error);
     }
   };
-  return (
+
+  const createPostWithLocation = async () => {
+    const userId = await AsyncStorage.getItem("userId").catch((e) => {
+      return e;
+    });
+    const area = await Location.reverseGeocodeAsync(location).catch((e) => {
+      return e;
+    });
+    fetch("http://192.168.0.15:8080/posts/create", {
+      method: "POST",
+      body: JSON.stringify({
+        userId: userId,
+        title: selectedCategory,
+        content: `Location: ${area[0].street},  ${area[0].city},  ${area[0].country}`,
+        isLocation: true,
+      }),
+      headers: { "Content-Type": "application/json" },
+    })
+      .then(() => {
+        setShowCategories(false);
+      })
+      .catch((error) => {
+        console.log("There was an error", error);
+      });
+  };
+
+  return isLoading ? (
+    <View style={[mapStyle.container, mapStyle.horizontal]}>
+      <ActivityIndicator size="large" color={colours.darkSlateGrey} />
+    </View>
+  ) : (
     <>
       <TouchableOpacity
         style={mapStyle.mapContainer}
@@ -105,9 +143,50 @@ export default function App() {
           height: showCategories ? Dimensions.get("window").height / 2 : 0,
         }}
       >
-        <ListItem title="Campervan site" />
-        <ListItem title="Landscape visit" />
-        <ListItem title="Another" />
+        <Button
+          title="Post"
+          onPress={createPostWithLocation}
+          disabled={selectedCategory === ""}
+        />
+
+        <TouchableOpacity
+          style={{
+            ...mapStyle.listItem,
+            backgroundColor:
+              selectedCategory === typesOfCategrories.campsite
+                ? colours.darkSlateGrey
+                : colours.white,
+          }}
+          onPress={() => setSelectedCategory(typesOfCategrories.campsite)}
+        >
+          <Text style={mapStyle.listItemText}>Campervan site</Text>
+        </TouchableOpacity>
+        <Divider style={{ marginLeft: 15, marginRight: 15 }} />
+        <TouchableOpacity
+          style={{
+            ...mapStyle.listItem,
+            backgroundColor:
+              selectedCategory === typesOfCategrories.landscape
+                ? colours.darkSlateGrey
+                : colours.white,
+          }}
+          onPress={() => setSelectedCategory(typesOfCategrories.landscape)}
+        >
+          <Text style={mapStyle.listItemText}>Landscape visit</Text>
+        </TouchableOpacity>
+        <Divider style={{ marginLeft: 15, marginRight: 15 }} />
+        <TouchableOpacity
+          style={{
+            ...mapStyle.listItem,
+            backgroundColor:
+              selectedCategory === typesOfCategrories.other
+                ? colours.darkSlateGrey
+                : colours.white,
+          }}
+          onPress={() => setSelectedCategory(typesOfCategrories.other)}
+        >
+          <Text style={mapStyle.listItemText}>Other</Text>
+        </TouchableOpacity>
       </View>
     </>
   );
@@ -166,5 +245,26 @@ const mapStyle = StyleSheet.create({
     overflow: "scroll",
     zIndex: 2,
     backgroundColor: colours.white,
+  },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  horizontal: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    padding: 10,
+  },
+  selectedListItem: {
+    backgroundColor: colours.dirtBrown,
+  },
+  listItem: {
+    width: "100%",
+    padding: 20,
+    paddingLeft: 15,
+    paddingRight: 15,
+  },
+  listItemText: {
+    fontSize: 16,
   },
 });
