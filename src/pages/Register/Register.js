@@ -4,7 +4,7 @@ import {
   Button,
   Stack,
 } from "@react-native-material/core";
-import { ImageBackground, StyleSheet, View } from "react-native";
+import { ImageBackground, StyleSheet, Text, View } from "react-native";
 import colours from "../../styles/colours";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import React, { useState, useContext } from "react";
@@ -13,14 +13,37 @@ import LoginContext from "../../../LoginContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Entypo } from "@expo/vector-icons";
+import Layout from "../../components/Layout";
+import CampervanSurface from "../../components/CampervanSurface";
 
 export default function Register({}) {
-  const [username, setuserName] = useState("anil");
-  const [password, setPassword] = useState("password");
+  const [username, setuserName] = useState("");
+  const [usernameError, setUsernameError] = useState("");
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
+
+  const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmedPassword, setConfirmedPassword] = useState("");
+  const [confirmedPasswordError, setConfirmedPasswordError] = useState("");
+
   const [passwordVisibility, setPasswordVisibility] = useState(true);
+  const [confirmedPasswordVisibility, setConfirmedasswordVisibility] =
+    useState(true);
+
   const passwordView = () => {
     setPasswordVisibility(!passwordVisibility);
   };
+  const confirmedPasswordView = () => {
+    setConfirmedasswordVisibility(!confirmedPasswordVisibility);
+  };
+
+  const isSubmitButtonDisabled =
+    username === "" ||
+    email === "" ||
+    password === "" ||
+    confirmedPassword === "" ||
+    password !== confirmedPassword;
 
   const image = {
     uri: "https://cdn.pixabay.com/photo/2020/01/22/15/50/illustration-4785614_1280.png",
@@ -51,66 +74,159 @@ export default function Register({}) {
         );
       });
   };
+
+  console.log(confirmedPassword, password);
   return (
     <React.Fragment>
-      <ImageBackground
-        source={image}
-        resizeMode="cover"
-        style={loginSurface.image}
-      >
+      <Layout>
         <Stack fill center spacing={4} style={loginSurface.stack}>
-          <Surface elevation={2} category="medium" style={loginSurface.surface}>
-            <View style={loginSurface.inputContainer}>
+          <CampervanSurface>
+            <View style={{ width: "100%", paddingBottom: 30 }}>
               <TextInput
-                style={loginSurface.usernamefields}
+                style={{
+                  ...loginSurface.topfields,
+                }}
+                inputStyle={emailError !== "" ? loginSurface.errorField : {}}
+                placeholder="Email"
+                variant="outlined"
+                onChangeText={(text) => {
+                  setEmail(text);
+                }}
+                onBlur={(e) => {
+                  const text = e.nativeEvent.text;
+                  if (text === "") {
+                    setEmailError("The email is required");
+                  } else {
+                    setEmailError("");
+                  }
+                }}
+                helperText={emailError !== "" ? emailError : undefined}
+              />
+              <TextInput
+                style={loginSurface.topfields}
+                inputStyle={usernameError !== "" ? loginSurface.errorField : {}}
                 placeholder="Username"
                 variant="outlined"
-                trailing={(props) => <IconButton {...props} />}
                 onChangeText={(text) => {
                   setuserName(text);
                 }}
+                onBlur={(e) => {
+                  const text = e.nativeEvent.text;
+                  if (text === "") {
+                    setUsernameError("The username is required");
+                  } else {
+                    setUsernameError("");
+                  }
+                }}
+                helperText={usernameError !== "" ? usernameError : undefined}
               />
 
               <TextInput
+                textContentType="oneTimeCode"
                 secureTextEntry={passwordVisibility}
-                style={loginSurface.passwordfield}
+                inputStyle={passwordError !== "" ? loginSurface.errorField : {}}
+                style={loginSurface.topfields}
                 placeholder="Password"
                 variant="outlined"
-                trailing={(props) => <IconButton {...props} />}
+                trailing={(props) => (
+                  <TouchableOpacity onPress={passwordView}>
+                    {!passwordVisibility ? (
+                      <Entypo name="eye" size={20} color={colours.black} />
+                    ) : (
+                      <Entypo
+                        name="eye-with-line"
+                        size={20}
+                        color={colours.black}
+                      />
+                    )}
+                  </TouchableOpacity>
+                )}
                 onChangeText={(text) => {
                   setPassword(text);
                 }}
+                onBlur={(e) => {
+                  const text = e.nativeEvent.text;
+                  if (text === "") {
+                    setPasswordError("The password is required");
+                  } else {
+                    setPasswordError("");
+                  }
+                }}
+                helperText={passwordError !== "" ? passwordError : undefined}
               />
-              <TouchableOpacity onPress={passwordView}>
-                {!passwordVisibility ? (
-                  <Entypo name="eye" size={35} color={colours.black} />
-                ) : (
-                  <Entypo
-                    name="eye-with-line"
-                    size={35}
-                    color={colours.black}
-                  />
-                )}
-              </TouchableOpacity>
-            </View>
-            <Stack fill center spacing={1}>
-              <Button
+
+              <TextInput
+                textContentType="oneTimeCode"
+                secureTextEntry={confirmedPasswordVisibility}
+                inputStyle={
+                  confirmedPasswordError !== "" ? loginSurface.errorField : {}
+                }
+                style={loginSurface.passwordfield}
+                placeholder="Confirm Password"
                 variant="outlined"
+                trailing={(props) => (
+                  <TouchableOpacity onPress={confirmedPasswordView}>
+                    {!confirmedPasswordVisibility ? (
+                      <Entypo name="eye" size={20} color={colours.black} />
+                    ) : (
+                      <Entypo
+                        name="eye-with-line"
+                        size={20}
+                        color={colours.black}
+                      />
+                    )}
+                  </TouchableOpacity>
+                )}
+                onChangeText={(text) => {
+                  setConfirmedPassword(text);
+                }}
+                onBlur={(e) => {
+                  const text = e.nativeEvent.text;
+                  if (text === "") {
+                    setConfirmedPasswordError(
+                      "The confirm password is required"
+                    );
+                  } else {
+                    setConfirmedPasswordError("");
+                  }
+                }}
+                helperText={
+                  confirmedPasswordError !== ""
+                    ? confirmedPasswordError
+                    : undefined
+                }
+              />
+              {confirmedPassword !== password &&
+                confirmedPassword !== "" &&
+                password !== "" && (
+                  <Text style={{ marginTop: 10, color: colours.red }}>
+                    Your passwords don't match
+                  </Text>
+                )}
+            </View>
+            <View>
+              <Button
+                disabled={isSubmitButtonDisabled}
                 title="Register"
-                color="#d4ac2d"
+                color={colours.mountainBlue}
+                tintColor={colours.white}
                 // the on press attribute takes a function which calls the function for executing the http protocol and posting user credentials to the database
                 onPress={() => userCredentials()}
               />
-            </Stack>
-          </Surface>
+            </View>
+          </CampervanSurface>
         </Stack>
-      </ImageBackground>
+      </Layout>
     </React.Fragment>
   );
 }
 
 const loginSurface = StyleSheet.create({
-  // stack: { opacity: 0.9 },
+  container: {
+    width: "100%",
+    backgroundColor: "red",
+    justifyContent: "space-between",
+  },
   surface: {
     height: "50%",
     width: "80%",
@@ -118,19 +234,19 @@ const loginSurface = StyleSheet.create({
     flexDirection: "column",
     borderRadius: "30%",
   },
-  usernamefields: {
-    width: "90%",
+  topfields: {
+    width: "100%",
+    paddingBottom: "3%",
+  },
+  errorField: {
+    borderWidth: 2,
+    borderColor: colours.red,
   },
   passwordfield: {
-    paddingTop: "3%",
-    width: "90%",
+    width: "100%",
   },
   inputContainer: {
     alignItems: "center",
     paddingTop: "15%",
-  },
-  image: {
-    flex: 1,
-    justifyContent: "center",
   },
 });

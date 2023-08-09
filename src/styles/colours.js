@@ -7,6 +7,9 @@ const white = "#ffffff";
 const black = "#000000";
 const dirtBrown = "#f9d597";
 const pistachio = "#e8fabe";
+const grassGreen = "#c1bd22";
+const mountainBlue = "#709dca";
+const red = "#cc1010";
 
 export default {
   darkSlateGrey,
@@ -18,4 +21,7 @@ export default {
   black,
   dirtBrown,
   pistachio,
+  grassGreen,
+  mountainBlue,
+  red,
 };
