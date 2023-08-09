@@ -1,10 +1,11 @@
 import { View, Text, TextInput, StyleSheet, Button, Image } from "react-native";
 import React, { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
+import Layout from "../../components/Layout";
 // import Video from "react-native-video";
 // import { ResizeMode, video } from "expo-av";
 
-export default function Post({ }) {
+export default function Post({}) {
   const [image, setImage] = useState(null);
   const videoVar = React.useRef(null);
   const [video, setVideo] = React.useState({});
@@ -31,29 +32,31 @@ export default function Post({ }) {
     }
   };
   return (
-    <View>
-      <Button
-        onPress={chooseMedia}
-        title="Choose Image"
-        style={createPost.chooseMediaButton}
-      ></Button>
-      {image && (
-        <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />
-      )}
-      {/* {video && (
+    <Layout>
+      <View>
+        <Button
+          onPress={chooseMedia}
+          title="Choose Image"
+          style={createPost.chooseMediaButton}
+        ></Button>
+        {image && (
+          <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />
+        )}
+        {/* {video && (
         <Video
-          ref={videoVar}
-          style={createPost.videoStyle}
-          source={{
-            uri: "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4",
-          }}
-          useNativeControls
-          resizeMode={ResizeMode.CONTAIN}
-          isLooping
-          // onPlaybackStatusUpdate={(status) => setStatus(() => status)}
+        ref={videoVar}
+        style={createPost.videoStyle}
+        source={{
+          uri: "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4",
+        }}
+        useNativeControls
+        resizeMode={ResizeMode.CONTAIN}
+        isLooping
+        // onPlaybackStatusUpdate={(status) => setStatus(() => status)}
         />
       )} */}
-    </View>
+      </View>
+    </Layout>
   );
 }
 const createPost = StyleSheet.create({
