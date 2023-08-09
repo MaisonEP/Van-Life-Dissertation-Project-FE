@@ -76,6 +76,7 @@ export default function App() {
 
   useEffect(() => {
     const value = async () => {
+      await AsyncStorage.clear();
       const response = await AsyncStorage.getItem("loggedIn");
 
       setLoggedIn(response === "true" ? true : false);

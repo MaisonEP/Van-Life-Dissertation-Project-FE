@@ -4,17 +4,30 @@ import {
   Button,
   Stack,
 } from "@react-native-material/core";
-
+import { ImageBackground, Keyboard, StyleSheet, View } from "react-native";
 import React, { useContext, useState } from "react";
 import { Surface } from "react-native-paper";
 import LoginContext from "../../../LoginContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-// import Text from "@react-native-material/core";
+import { backgroundImage } from "../../assets/backgroundImage";
+import Layout from "../../components/Layout";
+import CampervanSurface from "../../components/CampervanSurface";
+import colours from "../../styles/colours";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { Entypo } from "@expo/vector-icons";
+
 export default function Login({ navigation }) {
   const [username, setuserName] = useState("");
   const [password, setPassword] = useState("");
-  const myGlobalValues = useContext(LoginContext);
+  const [usernameError, setuserNameError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
+  const myGlobalValues = useContext(LoginContext);
+  const [passwordVisibility, setPasswordVisibility] = useState(true);
+
+  const passwordView = () => {
+    setPasswordVisibility(!passwordVisibility);
+  };
   //to retrieve data: pass the response of your fetch cal through a function then return response.json. This retrieves the response of the api call then pass the data through the the function to retrieve it.
   //fetch function allows the use of a url/api end point as a parameter to connect to your api client and dbms. it also takes other params like the abject containing method, body and headers.
   //JSON object has a method called stringify which takes the object containing username and password.
@@ -39,47 +52,98 @@ export default function Login({ navigation }) {
       });
   };
   return (
-    <React.Fragment>
+    <Layout>
       <Stack fill center spacing={4}>
-        <Surface
-          elevation={2}
-          category="medium"
-          style={{ width: "80%", height: "80%" }}
-        >
+        <CampervanSurface>
           <TextInput
-            placeholder="Email"
+            blurOnSubmit
+            placeholder="Username"
             variant="outlined"
-            trailing={(props) => <IconButton {...props} />}
             onChangeText={(text) => {
               setuserName(text.trim());
             }}
+            style={{ ...loginStyle.input, marginBottom: 10 }}
+            onBlur={(e) => {
+              const text = e.nativeEvent.text;
+              if (text === "") {
+                setuserNameError("The username is required");
+              } else {
+                setuserNameError("");
+              }
+            }}
+            helperText={usernameError !== "" ? usernameError : undefined}
+            inputStyle={usernameError !== "" ? loginStyle.errorField : {}}
           />
           <TextInput
             placeholder="Password"
             variant="outlined"
-            trailing={(props) => <IconButton {...props} />}
+            secureTextEntry={passwordVisibility}
+            trailing={(props) => (
+              <TouchableOpacity onPress={passwordView}>
+                {!passwordVisibility ? (
+                  <Entypo name="eye" size={20} color={colours.black} />
+                ) : (
+                  <Entypo
+                    name="eye-with-line"
+                    size={20}
+                    color={colours.black}
+                  />
+                )}
+              </TouchableOpacity>
+            )}
             onChangeText={(text) => {
               setPassword(text);
             }}
+            style={loginStyle.input}
+            onBlur={(e) => {
+              const text = e.nativeEvent.text;
+              if (text === "") {
+                setPasswordError("The password is required");
+              } else {
+                setPasswordError("");
+              }
+            }}
+            helperText={passwordError !== "" ? passwordError : undefined}
+            inputStyle={passwordError !== "" ? loginStyle.errorField : {}}
           />
-          <Stack fill center spacing={1}>
+          <View style={{ paddingBottom: 10, paddingTop: 30 }}>
             <Button
-              variant="outlined"
+              disabled={username === "" || password === ""}
               title="Login"
-              color="#d4ac2d"
+              color={colours.grassGreen}
+              tintColor={colours.white}
               // the on press attribute takes a function which calls the function for executing the http protocol and posting user credentials to the database
               onPress={() => {
                 userCredentials();
               }}
+              titleStyle={loginStyle.buttons}
             />
+          </View>
 
-            <Button
-              title="Register Here"
-              onPress={() => navigation.navigate("Register")}
-            ></Button>
-          </Stack>
-        </Surface>
+          <Button
+            color={colours.mountainBlue}
+            tintColor={colours.white}
+            title="Register Here"
+            onPress={() => navigation.navigate("Register")}
+            titleStyle={loginStyle.buttons}
+          ></Button>
+        </CampervanSurface>
       </Stack>
-    </React.Fragment>
+    </Layout>
   );
 }
+
+const loginStyle = StyleSheet.create({
+  input: {
+    width: "100%",
+  },
+  buttons: {
+    width: "100%",
+    textAlign: "center",
+    alignContenrt: "center",
+  },
+  errorField: {
+    borderWidth: 2,
+    borderColor: colours.red,
+  },
+});
