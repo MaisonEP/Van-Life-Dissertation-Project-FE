@@ -16,7 +16,7 @@ import Search from "./src/pages/search/Search";
 import Post from "./src/pages/post/Post";
 import Explore from "./src/pages/Explore/Explore";
 import Register from "./src/pages/Register/Register";
-import { NavigationContainer } from "@react-navigation/native";
+import { Link, NavigationContainer } from "@react-navigation/native";
 import AppNavBar from "./src/components/AppNavBar";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -66,17 +66,19 @@ export default function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [appLoading, setAppLoading] = useState(true);
   const [refetchingPosts, setRefetchingPosts] = useState(true);
+  const [postLocation, setPostLocation] = useState();
 
   const initialContext = {
     isLoggedIn: loggedIn,
     setLoggedIn: setLoggedIn,
     refetchingPosts: refetchingPosts,
     setRefetchingPosts: setRefetchingPosts,
+    postLocation: postLocation,
+    setPostLocation: setPostLocation,
   };
 
   useEffect(() => {
     const value = async () => {
-      await AsyncStorage.clear();
       const response = await AsyncStorage.getItem("loggedIn");
 
       setLoggedIn(response === "true" ? true : false);
@@ -133,6 +135,11 @@ export default function App() {
           )}
         </ImageBackground>
       </NavigationContainer>
+      {/* Credit for icons */}
+      <Link
+        to={"https://www.flaticon.com/free-icons/location"}
+        style={{ display: "none" }}
+      ></Link>
     </LoginContext.Provider>
   );
 }

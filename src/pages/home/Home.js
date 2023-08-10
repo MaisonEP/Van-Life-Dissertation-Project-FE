@@ -50,19 +50,27 @@ export default function Home({ navigation }) {
           spacing={4}
           testID="HIIIIIIIIIIIIIIIIIIIIIIIIIIIII"
         >
-          {allPosts?.reverse().map((postInfo, i) => {
-            return (
-              <View style={postContainer.mainContainer} key={i}>
-                <FeedCard
-                  publisherName={postInfo.user.username}
-                  postTitle={postInfo.title}
-                  postContent={postInfo.content}
-                  navigation={navigation}
-                  isLocation={postInfo.location}
-                ></FeedCard>
-              </View>
-            );
-          })}
+          {allPosts ? (
+            [...allPosts]?.reverse().map((postInfo, i) => {
+              return (
+                <View style={postContainer.mainContainer} key={i}>
+                  <FeedCard
+                    publisherName={postInfo.user.username}
+                    postTitle={postInfo.title}
+                    postContent={postInfo.content}
+                    navigation={navigation}
+                    isLocation={postInfo.location}
+                    location={{
+                      latitude: postInfo.latitude,
+                      longitude: postInfo.longitude,
+                    }}
+                  ></FeedCard>
+                </View>
+              );
+            })
+          ) : (
+            <></>
+          )}
         </Stack>
       </ScrollView>
     </ImageBackground>
