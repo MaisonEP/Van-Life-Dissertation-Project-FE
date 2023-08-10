@@ -59,6 +59,10 @@ export default function Home({ navigation }) {
                   postContent={postInfo.content}
                   navigation={navigation}
                   isLocation={postInfo.location}
+                  location={{
+                    latitude: postInfo.latitude,
+                    longitude: postInfo.longitude,
+                  }}
                 ></FeedCard>
               </View>
             );

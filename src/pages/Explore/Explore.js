@@ -6,9 +6,11 @@ import {
   LayoutAnimation,
   ActivityIndicator,
   Text,
+  Image,
 } from "react-native";
 import { StyleSheet } from "react-native";
 import MapView, { Marker } from "react-native-maps";
+import MapViewDirections from "react-native-maps-directions";
 import { StatusBar } from "expo-status-bar";
 import { useState, useEffect, useRef, useContext } from "react";
 import * as Location from "expo-location";
@@ -18,15 +20,24 @@ import { ListItem, Divider } from "@react-native-material/core";
 import { Button } from "@react-native-material/core";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import LoginContext from "../../../LoginContext";
+import { API_KEY_GOOGLE } from "../../config/config";
+import redPin from "../../assets/images/red-pin.png";
+import bluePin from "../../assets/images/blue-pin.png";
 
 export default function App() {
   const [location, setLocation] = useState();
+  const [searchlocation, setSearchLocation] = useState();
+
   const [address, setAddress] = useState();
   const [showCategories, setShowCategories] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const context = useContext(LoginContext);
-
+  const destinationLocation = context.postLocation;
+  console.log(destinationLocation);
+  const dimensions = Dimensions.get("window");
+  const width = dimensions.width;
+  const height = dimensions.height;
   const typesOfCategrories = {
     campsite: "Campsite",
     landscape: "Landscape",
@@ -38,6 +49,7 @@ export default function App() {
   LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
 
   const hanldeScreenClick = () => {
+    console.log("hi");
     setShowCategories(false);
   };
 
@@ -53,6 +65,10 @@ export default function App() {
           latitude: currentLocation.coords.latitude,
           longitude: currentLocation.coords.longitude,
         });
+        // setSearchLocation({
+        //   latitude: currentLocation.coords.latitude,
+        //   longitude: currentLocation.coords.longitude,
+        // });
         setIsLoading(false);
       } catch (error) {
         console.log("This is the error" + error);
@@ -64,6 +80,11 @@ export default function App() {
   const geocode = async () => {
     try {
       const geocodedLocation = await Location.geocodeAsync(address);
+      console.log(geocodedLocation);
+      setSearchLocation({
+        latitude: geocodedLocation[0].latitude,
+        longitude: geocodedLocation[0].longitude,
+      });
     } catch (error) {
       console.log("My seccond error" + error);
     }
@@ -73,9 +94,11 @@ export default function App() {
     const userId = await AsyncStorage.getItem("userId").catch((e) => {
       return e;
     });
-    const area = await Location.reverseGeocodeAsync(location).catch((e) => {
-      return e;
-    });
+    const area = await Location.reverseGeocodeAsync(searchlocation).catch(
+      (e) => {
+        return e;
+      }
+    );
     fetch("http://192.168.0.15:8080/posts/create", {
       method: "POST",
       body: JSON.stringify({
@@ -83,6 +106,8 @@ export default function App() {
         title: selectedCategory,
         content: `Location: ${area[0].street},  ${area[0].city},  ${area[0].country}`,
         isLocation: true,
+        longitude: searchlocation.longitude,
+        latitude: searchlocation.latitude,
       }),
       headers: { "Content-Type": "application/json" },
     })
@@ -109,7 +134,7 @@ export default function App() {
         <View
           style={{
             ...mapStyle.actionsContainer,
-            width: Dimensions.get("window").width - 45,
+            width: width - 45,
           }}
         >
           <TextInput
@@ -117,7 +142,10 @@ export default function App() {
             placeholderTextColor={colours.black}
             color={colours.darkSlateGrey}
             value={address}
-            onChangeText={setAddress}
+            onChangeText={(text) => {
+              console.log(text);
+              setAddress(text);
+            }}
             onSubmitEditing={() => {
               geocode();
             }}
@@ -132,37 +160,151 @@ export default function App() {
             <Icon name="map-marker-plus-outline" color={"#FFFFFF"} size={30} />
           </TouchableOpacity>
         </View>
+        <MapView
+          style={mapStyle.map}
+          initialRegion={{
+            latitude: location.latitude,
+            longitude: location.longitude,
+            latitudeDelta: 0.00922,
+            longitudeDelta: 0.00922 * (width / height), //initial zoom in
+          }}
+          region={
+            destinationLocation
+              ? {
+                  latitude:
+                    (location.latitude + destinationLocation.latitude) / 2,
+                  longitude:
+                    (location.longitude + destinationLocation.longitude) / 2,
+                  latitudeDelta: Math.abs(
+                    destinationLocation.latitude - location.latitude
+                  ),
+                  longitudeDelta:
+                    Math.abs(
+                      destinationLocation.longitude - location.longitude
+                    ) * 2,
+                }
+              : searchlocation
+              ? {
+                  ...searchlocation,
+                  latitudeDelta: 0.00922,
+                  longitudeDelta: 0.00922 * (width / height), //initial zoom in
+                }
+              : {
+                  ...location,
+                  latitudeDelta: 0.00922,
+                  longitudeDelta: 0.00922 * (width / height), //initial zoom in
+                }
+          }
+        >
+          <Marker coordinate={location} title="My location">
+            <Image
+              source={redPin}
+              style={{
+                height: 30,
+                width: 30,
+                transform: [{ translateY: -15 }],
+                zIndex: 5,
+              }}
+            />
+          </Marker>
+          {destinationLocation ?? searchlocation ? (
+            <Marker
+              coordinate={destinationLocation ?? searchlocation}
+              title="Destination"
+            >
+              <Image
+                source={bluePin}
+                style={{
+                  height: 30,
+                  width: 30,
+                  transform: [{ translateY: -15 }],
+                }}
+              />
+            </Marker>
+          ) : (
+            <></>
+          )}
 
-        <MapView style={mapStyle.map}>
-          <Marker coordinate={location} title="My location" />
+          {destinationLocation ? (
+            <MapViewDirections
+              origin={location}
+              destination={destinationLocation}
+              strokeWidth={5}
+              strokeColor={colours.purple}
+              apikey={API_KEY_GOOGLE}
+            />
+          ) : (
+            <></>
+          )}
         </MapView>
-
+        {destinationLocation ? (
+          <Button
+            onPress={() => {
+              setSearchLocation(searchlocation);
+              context.setPostLocation(undefined);
+            }}
+            style={mapStyle.exitDestination}
+            title="Exit"
+            color={colours.darkSlateGrey}
+            trailing={(props) => <Icon name="close-box-outline" {...props} />}
+          ></Button>
+        ) : (
+          <></>
+        )}
+        {searchlocation && !destinationLocation ? (
+          <Button
+            onPress={() => {
+              context.setPostLocation(searchlocation);
+              setSearchLocation(undefined);
+            }}
+            style={mapStyle.exitDestination}
+            title="Go"
+            color={colours.darkSlateGrey}
+            trailing={(props) => (
+              <Icon name="van-utility" {...props} size={25} />
+            )}
+          ></Button>
+        ) : (
+          <></>
+        )}
         <StatusBar style="auto" />
       </TouchableOpacity>
       <View
         ref={categoriesRef}
         style={{
           ...mapStyle.categories,
-          height: showCategories ? Dimensions.get("window").height / 2 : 0,
+          height: showCategories ? "auto" : 0,
+          paddingBottom: showCategories ? 20 : 0,
         }}
       >
-        <Button
-          title="Post"
-          onPress={createPostWithLocation}
-          disabled={selectedCategory === ""}
-        />
-
+        <Text
+          style={{
+            fontSize: 20,
+            textAlign: "center",
+            padding: 10,
+            backgroundColor: colours.darkSlateGrey,
+            color: colours.white,
+          }}
+        >
+          Create a post with your location
+        </Text>
         <TouchableOpacity
           style={{
             ...mapStyle.listItem,
             backgroundColor:
               selectedCategory === typesOfCategrories.campsite
-                ? colours.darkSlateGrey
+                ? colours.grassGreen
                 : colours.white,
           }}
           onPress={() => setSelectedCategory(typesOfCategrories.campsite)}
         >
-          <Text style={mapStyle.listItemText}>Campervan site</Text>
+          <Text
+            style={{
+              ...mapStyle.listItemText,
+            }}
+          >
+            Campsite
+          </Text>
         </TouchableOpacity>
         <Divider style={{ marginLeft: 15, marginRight: 15 }} />
         <TouchableOpacity
@@ -170,12 +312,19 @@ export default function App() {
             ...mapStyle.listItem,
             backgroundColor:
               selectedCategory === typesOfCategrories.landscape
-                ? colours.darkSlateGrey
+                ? colours.grassGreen
                 : colours.white,
+            color: colours.white,
           }}
           onPress={() => setSelectedCategory(typesOfCategrories.landscape)}
         >
-          <Text style={mapStyle.listItemText}>Landscape visit</Text>
+          <Text
+            style={{
+              ...mapStyle.listItemText,
+            }}
+          >
+            Landscape
+          </Text>
         </TouchableOpacity>
         <Divider style={{ marginLeft: 15, marginRight: 15 }} />
         <TouchableOpacity
@@ -183,13 +332,27 @@ export default function App() {
             ...mapStyle.listItem,
             backgroundColor:
               selectedCategory === typesOfCategrories.other
-                ? colours.darkSlateGrey
+                ? colours.grassGreen
                 : colours.white,
+            color: colours.white,
           }}
           onPress={() => setSelectedCategory(typesOfCategrories.other)}
         >
-          <Text style={mapStyle.listItemText}>Other</Text>
+          <Text
+            style={{
+              ...mapStyle.listItemText,
+            }}
+          >
+            Other
+          </Text>
         </TouchableOpacity>
+        <Button
+          title="Post"
+          onPress={createPostWithLocation}
+          disabled={selectedCategory === ""}
+          style={{ width: width / 2, alignSelf: "center", marginTop: 10 }}
+          color={colours.mountainBlue}
+        />
       </View>
     </>
   );
@@ -269,5 +432,10 @@ const mapStyle = StyleSheet.create({
   },
   listItemText: {
     fontSize: 16,
+  },
+  exitDestination: {
+    position: "absolute",
+    bottom: 30,
+    right: 30,
   },
 });
