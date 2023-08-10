@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   Text,
   Image,
+  Keyboard,
 } from "react-native";
 import { StyleSheet } from "react-native";
 import MapView, { Marker } from "react-native-maps";
@@ -34,7 +35,6 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const context = useContext(LoginContext);
   const destinationLocation = context.postLocation;
-  console.log(destinationLocation);
   const dimensions = Dimensions.get("window");
   const width = dimensions.width;
   const height = dimensions.height;
@@ -49,7 +49,6 @@ export default function App() {
   LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
 
   const hanldeScreenClick = () => {
-    console.log("hi");
     setShowCategories(false);
   };
 
@@ -65,10 +64,6 @@ export default function App() {
           latitude: currentLocation.coords.latitude,
           longitude: currentLocation.coords.longitude,
         });
-        // setSearchLocation({
-        //   latitude: currentLocation.coords.latitude,
-        //   longitude: currentLocation.coords.longitude,
-        // });
         setIsLoading(false);
       } catch (error) {
         console.log("This is the error" + error);
@@ -80,7 +75,6 @@ export default function App() {
   const geocode = async () => {
     try {
       const geocodedLocation = await Location.geocodeAsync(address);
-      console.log(geocodedLocation);
       setSearchLocation({
         latitude: geocodedLocation[0].latitude,
         longitude: geocodedLocation[0].longitude,
@@ -137,20 +131,34 @@ export default function App() {
             width: width - 45,
           }}
         >
-          <TextInput
-            placeholder="Enter Location"
-            placeholderTextColor={colours.black}
-            color={colours.darkSlateGrey}
-            value={address}
-            onChangeText={(text) => {
-              console.log(text);
-              setAddress(text);
+          <View
+            style={{
+              width: width - 90,
             }}
-            onSubmitEditing={() => {
-              geocode();
-            }}
-            style={mapStyle.mapSearch}
-          ></TextInput>
+          >
+            <TextInput
+              placeholder="Enter Location"
+              placeholderTextColor={colours.black}
+              color={colours.darkSlateGrey}
+              value={address}
+              onChangeText={(text) => {
+                setAddress(text);
+              }}
+              onSubmitEditing={() => {
+                geocode();
+              }}
+              style={mapStyle.mapSearch}
+            ></TextInput>
+            <Icon
+              name="check"
+              size={30}
+              style={{ position: "absolute", right: 10, top: 10 }}
+              onPress={() => {
+                Keyboard.dismiss();
+                geocode();
+              }}
+            ></Icon>
+          </View>
           <TouchableOpacity
             style={mapStyle.plusButton}
             onPress={() => {
@@ -252,21 +260,36 @@ export default function App() {
           <></>
         )}
         {searchlocation && !destinationLocation ? (
-          <Button
-            onPress={() => {
-              context.setPostLocation(searchlocation);
-              setSearchLocation(undefined);
-            }}
-            style={mapStyle.exitDestination}
-            title="Go"
-            color={colours.darkSlateGrey}
-            trailing={(props) => (
-              <Icon name="van-utility" {...props} size={25} />
-            )}
-          ></Button>
+          <>
+            <Button
+              onPress={() => {
+                context.setPostLocation(searchlocation);
+                setSearchLocation(undefined);
+              }}
+              style={mapStyle.exitDestination}
+              title="Go"
+              color={colours.darkSlateGrey}
+              trailing={(props) => (
+                <Icon name="van-utility" {...props} size={25} />
+              )}
+            ></Button>
+            <Button
+              onPress={() => {
+                setAddress(undefined);
+                setSearchLocation(undefined);
+              }}
+              style={mapStyle.exitSearch}
+              title="Exit"
+              color={colours.darkSlateGrey}
+              trailing={(props) => (
+                <Icon name="close-box-outline" {...props} size={25} />
+              )}
+            ></Button>
+          </>
         ) : (
           <></>
         )}
+
         <StatusBar style="auto" />
       </TouchableOpacity>
       <View
@@ -382,6 +405,7 @@ const mapStyle = StyleSheet.create({
     shadowOpacity: 0.5,
     flexShrink: 2,
     width: "100%",
+    paddingRight: 50,
   },
   actionsContainer: {
     margin: 15,
@@ -437,5 +461,10 @@ const mapStyle = StyleSheet.create({
     position: "absolute",
     bottom: 30,
     right: 30,
+  },
+  exitSearch: {
+    position: "absolute",
+    bottom: 30,
+    left: 30,
   },
 });
