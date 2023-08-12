@@ -79,7 +79,10 @@ export default function App() {
 
   useEffect(() => {
     const value = async () => {
-      const response = await AsyncStorage.getItem("loggedIn");
+      // await AsyncStorage.clear();
+      const response = await AsyncStorage.getItem("loggedIn").catch(() =>
+        console.log("There was an issue getting the user id")
+      );
 
       setLoggedIn(response === "true" ? true : false);
       setAppLoading(false);
