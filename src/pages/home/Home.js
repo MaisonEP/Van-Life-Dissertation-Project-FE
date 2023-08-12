@@ -9,17 +9,12 @@ export default function Home({ navigation }) {
   const [allPosts, setAllPosts] = useState();
   const context = useContext(LoginContext);
 
-  const postContent = [
-    { publisherName: "Erl", publisherLocation: "Cardiff" },
-    { publisherName: "Ev", publisherLocation: "The Jungle" },
-    { publisherName: "Ev", publisherLocation: "The Jungle" },
-  ];
-
   const image = {
     uri: "https://cdn.pixabay.com/photo/2020/01/22/15/50/illustration-4785614_1280.png",
   };
 
   useEffect(() => {
+    console.log(context.refetchingPosts);
     if (context.refetchingPosts) {
       fetch("http://192.168.0.15:8080/posts")
         .then((response) => {
@@ -51,7 +46,7 @@ export default function Home({ navigation }) {
           testID="HIIIIIIIIIIIIIIIIIIIIIIIIIIIII"
         >
           {allPosts ? (
-            [...allPosts]?.reverse().map((postInfo, i) => {
+            [...allPosts].reverse().map((postInfo, i) => {
               return (
                 <View style={postContainer.mainContainer} key={i}>
                   <FeedCard
@@ -64,6 +59,7 @@ export default function Home({ navigation }) {
                       latitude: postInfo.latitude,
                       longitude: postInfo.longitude,
                     }}
+                    image={postInfo?.image}
                   ></FeedCard>
                 </View>
               );

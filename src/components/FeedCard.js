@@ -11,6 +11,7 @@ import {
   Dimensions,
   StyleSheet,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import { useContext, useState } from "react";
@@ -23,6 +24,7 @@ const FeedCard = ({
   navigation,
   isLocation,
   location,
+  image,
 }) => {
   const viewHeight = Dimensions.get("window").height / 3;
   const context = useContext(LoginContext);
@@ -76,6 +78,12 @@ const FeedCard = ({
 
               <View style={postStyle.contentText}>
                 <Text>{postContent}</Text>
+                {image && (
+                  <Image
+                    source={{ uri: `data:image/jpg;base64,${image}` }}
+                    style={{ width: 200, height: 200, marginBottom: 20 }}
+                  />
+                )}
               </View>
             </View>
             <View style={postStyle.interactionLayout}>
