@@ -11,6 +11,7 @@ import {
   Dimensions,
   StyleSheet,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import { useContext, useState } from "react";
@@ -23,6 +24,7 @@ const FeedCard = ({
   navigation,
   isLocation,
   location,
+  image,
 }) => {
   const viewHeight = Dimensions.get("window").height / 3;
   const context = useContext(LoginContext);
@@ -75,6 +77,16 @@ const FeedCard = ({
               </View>
 
               <View style={postStyle.contentText}>
+                {image && (
+                  <Image
+                    source={{ uri: `data:image/jpg;base64,${image}` }}
+                    style={{
+                      width: Dimensions.get("window").width / 1.5,
+                      height: Dimensions.get("window").width / 1.5,
+                      marginBottom: 20,
+                    }}
+                  />
+                )}
                 <Text>{postContent}</Text>
               </View>
             </View>
@@ -130,8 +142,8 @@ const postStyle = StyleSheet.create({
     backgroundColor: colours.white,
     width: "100%",
     display: "flex",
-    maxHeight: 500,
     overflow: "scroll",
+    // height: "100%",
   },
   contentLayout: {
     flexDirection: "row",
@@ -140,10 +152,13 @@ const postStyle = StyleSheet.create({
   },
   contentBody: {
     flexGrow: 1,
+    width: "100%",
   },
   displayPicture: { paddingRight: 20 },
   usernameAndContent: {
     flexShrink: 1,
+    width: "100%",
+    // height: "100%",
   },
   UsernameContainer: {
     paddingBottom: 10,
@@ -153,7 +168,10 @@ const postStyle = StyleSheet.create({
     paddingBottom: 20,
     paddingTop: 20,
   },
-  contentText: {},
+  contentText: {
+    width: "100%",
+    // height: "100%",
+  },
   contentInteraction: {},
   interactionLayout: {
     display: "flex",

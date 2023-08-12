@@ -1,19 +1,20 @@
-import { TextInput, Surface, Stack, Avatar } from "@react-native-material/core";
+import {
+  TextInput,
+  Surface,
+  Stack,
+  Avatar,
+  ActivityIndicator,
+} from "@react-native-material/core";
 import { StyleSheet } from "react-native";
 import FeedCard from "../../components/FeedCard";
 import { ScrollView, View, ImageBackground } from "react-native";
 import { useContext, useEffect, useState } from "react";
 import LoginContext from "../../../LoginContext";
+import colours from "../../styles/colours";
 
 export default function Home({ navigation }) {
   const [allPosts, setAllPosts] = useState();
   const context = useContext(LoginContext);
-
-  const postContent = [
-    { publisherName: "Erl", publisherLocation: "Cardiff" },
-    { publisherName: "Ev", publisherLocation: "The Jungle" },
-    { publisherName: "Ev", publisherLocation: "The Jungle" },
-  ];
 
   const image = {
     uri: "https://cdn.pixabay.com/photo/2020/01/22/15/50/illustration-4785614_1280.png",
@@ -44,14 +45,18 @@ export default function Home({ navigation }) {
       style={postContainer.image}
     >
       <ScrollView>
-        <Stack
-          style={{ margin: 16 }}
-          items="center"
-          spacing={4}
-          testID="HIIIIIIIIIIIIIIIIIIIIIIIIIIIII"
-        >
+        {context.refetchingPosts ? (
+          <ActivityIndicator
+            style={{ marginTop: 30 }}
+            size="large"
+            color={colours.darkSlateGrey}
+          />
+        ) : (
+          <></>
+        )}
+        <Stack style={{ margin: 16 }} items="center" spacing={4}>
           {allPosts ? (
-            [...allPosts]?.reverse().map((postInfo, i) => {
+            [...allPosts].reverse().map((postInfo, i) => {
               return (
                 <View style={postContainer.mainContainer} key={i}>
                   <FeedCard
@@ -64,6 +69,7 @@ export default function Home({ navigation }) {
                       latitude: postInfo.latitude,
                       longitude: postInfo.longitude,
                     }}
+                    image={postInfo?.image}
                   ></FeedCard>
                 </View>
               );

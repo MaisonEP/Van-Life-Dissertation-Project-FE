@@ -88,11 +88,12 @@ export default function App() {
     const userId = await AsyncStorage.getItem("userId").catch((e) => {
       return e;
     });
-    const area = await Location.reverseGeocodeAsync(searchlocation).catch(
-      (e) => {
-        return e;
-      }
-    );
+
+    const areaToFind = searchlocation ?? location;
+    const area = await Location.reverseGeocodeAsync(areaToFind).catch((e) => {
+      return e;
+    });
+    console.log("hi");
     fetch("http://192.168.0.15:8080/posts/create", {
       method: "POST",
       body: JSON.stringify({
@@ -100,8 +101,9 @@ export default function App() {
         title: selectedCategory,
         content: `Location: ${area[0].street},  ${area[0].city},  ${area[0].country}`,
         isLocation: true,
-        longitude: searchlocation.longitude,
-        latitude: searchlocation.latitude,
+        longitude: areaToFind.longitude,
+        latitude: areaToFind.latitude,
+        file: null,
       }),
       headers: { "Content-Type": "application/json" },
     })
