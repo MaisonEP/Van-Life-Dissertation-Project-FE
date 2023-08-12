@@ -1,9 +1,16 @@
-import { TextInput, Surface, Stack, Avatar } from "@react-native-material/core";
+import {
+  TextInput,
+  Surface,
+  Stack,
+  Avatar,
+  ActivityIndicator,
+} from "@react-native-material/core";
 import { StyleSheet } from "react-native";
 import FeedCard from "../../components/FeedCard";
 import { ScrollView, View, ImageBackground } from "react-native";
 import { useContext, useEffect, useState } from "react";
 import LoginContext from "../../../LoginContext";
+import colours from "../../styles/colours";
 
 export default function Home({ navigation }) {
   const [allPosts, setAllPosts] = useState();
@@ -14,7 +21,6 @@ export default function Home({ navigation }) {
   };
 
   useEffect(() => {
-    console.log(context.refetchingPosts);
     if (context.refetchingPosts) {
       fetch("http://192.168.0.15:8080/posts")
         .then((response) => {
@@ -39,12 +45,16 @@ export default function Home({ navigation }) {
       style={postContainer.image}
     >
       <ScrollView>
-        <Stack
-          style={{ margin: 16 }}
-          items="center"
-          spacing={4}
-          testID="HIIIIIIIIIIIIIIIIIIIIIIIIIIIII"
-        >
+        {context.refetchingPosts ? (
+          <ActivityIndicator
+            style={{ marginTop: 30 }}
+            size="large"
+            color={colours.darkSlateGrey}
+          />
+        ) : (
+          <></>
+        )}
+        <Stack style={{ margin: 16 }} items="center" spacing={4}>
           {allPosts ? (
             [...allPosts].reverse().map((postInfo, i) => {
               return (

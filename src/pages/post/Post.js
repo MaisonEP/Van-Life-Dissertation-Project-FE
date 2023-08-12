@@ -2,11 +2,14 @@ import { View, StyleSheet, Image, Text } from "react-native";
 import React, { useContext, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import Layout from "../../components/Layout";
-import { Button, Stack, TextInput } from "@react-native-material/core";
+import {
+  ActivityIndicator,
+  Button,
+  Stack,
+  TextInput,
+} from "@react-native-material/core";
 import CampervanSurface from "../../components/CampervanSurface";
 import colours from "../../styles/colours";
-// import Video from "react-native-video";
-// import { ResizeMode, video } from "expo-av";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import LoginContext from "../../../LoginContext";
@@ -18,13 +21,14 @@ export default function Post({ navigation }) {
   const [video, setVideo] = React.useState({});
   const [caption, setCaption] = useState("");
   const context = useContext(LoginContext);
+  const [loading, setLoading] = useState(false);
 
   const chooseMedia = async () => {
     try {
       const media = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
-        aspect: [4, 3],
+        aspect: [3, 7],
         quality: 1,
         base64: true,
       });
@@ -42,6 +46,7 @@ export default function Post({ navigation }) {
   };
 
   const createMediaPost = async () => {
+    setLoading(true);
     const userId = await AsyncStorage.getItem("userId").catch((e) => {
       return e;
     });
@@ -50,23 +55,26 @@ export default function Post({ navigation }) {
       method: "POST",
       body: JSON.stringify({
         userId: userId,
-        title: "selectedCategory",
-        content: "con tent",
+        title: "",
+        content: caption,
         isLocation: false,
         longitude: null,
         latitude: null,
-        file: JSON.stringify({ base64: image.base64 }),
+        file: image.base64.slice(0, 5000000),
+        file2: image.base64.slice(5000000),
       }),
       headers: { "Content-Type": "application/json" },
     })
       .then(() => {
         context.setRefetchingPosts(true);
-        // navigation.navigate("HomeWrapper");
-        console.log("---");
-        console.log("navigate");
+        setImage(undefined);
+        navigation.navigate("HomeWrapper");
       })
       .catch((error) => {
         console.log("There was an error", error);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -84,7 +92,7 @@ export default function Post({ navigation }) {
             <>
               <Image
                 source={{ uri: image.uri }}
-                style={{ width: 200, height: 200, marginBottom: 20 }}
+                style={{ width: 200, height: 100, marginBottom: 20 }}
               />
               <Button
                 title="Remove image"
@@ -108,9 +116,15 @@ export default function Post({ navigation }) {
             }}
           />
           <Button
-            title="Post"
+            title={
+              loading ? (
+                <ActivityIndicator size="large" color={colours.darkSlateGrey} />
+              ) : (
+                "Post"
+              )
+            }
             style={createPost.chooseMediaButton}
-            disabled={!image}
+            disabled={!image || loading}
             color={colours.darkSlateGrey}
             onPress={() => createMediaPost()}
           />

@@ -77,13 +77,17 @@ const FeedCard = ({
               </View>
 
               <View style={postStyle.contentText}>
-                <Text>{postContent}</Text>
                 {image && (
                   <Image
                     source={{ uri: `data:image/jpg;base64,${image}` }}
-                    style={{ width: 200, height: 200, marginBottom: 20 }}
+                    style={{
+                      width: Dimensions.get("window").width / 1.5,
+                      height: Dimensions.get("window").width / 1.5,
+                      marginBottom: 20,
+                    }}
                   />
                 )}
+                <Text>{postContent}</Text>
               </View>
             </View>
             <View style={postStyle.interactionLayout}>
@@ -138,8 +142,8 @@ const postStyle = StyleSheet.create({
     backgroundColor: colours.white,
     width: "100%",
     display: "flex",
-    maxHeight: 500,
     overflow: "scroll",
+    // height: "100%",
   },
   contentLayout: {
     flexDirection: "row",
@@ -148,10 +152,13 @@ const postStyle = StyleSheet.create({
   },
   contentBody: {
     flexGrow: 1,
+    width: "100%",
   },
   displayPicture: { paddingRight: 20 },
   usernameAndContent: {
     flexShrink: 1,
+    width: "100%",
+    // height: "100%",
   },
   UsernameContainer: {
     paddingBottom: 10,
@@ -161,7 +168,10 @@ const postStyle = StyleSheet.create({
     paddingBottom: 20,
     paddingTop: 20,
   },
-  contentText: {},
+  contentText: {
+    width: "100%",
+    // height: "100%",
+  },
   contentInteraction: {},
   interactionLayout: {
     display: "flex",
