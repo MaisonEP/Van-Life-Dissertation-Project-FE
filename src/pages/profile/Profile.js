@@ -56,8 +56,9 @@ export default function Profile({ navigation }) {
       method: "PATCH",
       body: JSON.stringify({
         userId: userId,
-        file: image.base64.slice(0, 5000000),
-        file2: image.base64.slice(5000000),
+        file: image ? image.base64.slice(0, 5000000) : null,
+        file2: image ? image.base64.slice(5000000) : null,
+        bio: caption,
       }),
       headers: { "Content-Type": "application/json" },
     })
@@ -93,7 +94,7 @@ export default function Profile({ navigation }) {
     };
     callGetUser();
   }, []);
-
+  console.log(caption || user.bio);
   return (
     <Layout>
       <Stack fill center spacing={4}>
@@ -163,6 +164,7 @@ export default function Profile({ navigation }) {
                 onChangeText={(text) => {
                   setCaption(text);
                 }}
+                value={caption || user.bio}
               />
               {image ? (
                 <>
@@ -175,23 +177,27 @@ export default function Profile({ navigation }) {
                       setImage(undefined);
                     }}
                   />
-                  <Button
-                    title={
-                      loading ? (
-                        <ActivityIndicator
-                          size="large"
-                          color={colours.darkSlateGrey}
-                        />
-                      ) : (
-                        "Save"
-                      )
-                    }
-                    style={createPost.chooseMediaButton}
-                    disabled={!image || loading}
-                    color={colours.darkSlateGrey}
-                    onPress={() => saveProfile()}
-                  />
                 </>
+              ) : (
+                <></>
+              )}
+              {image || caption ? (
+                <Button
+                  title={
+                    loading ? (
+                      <ActivityIndicator
+                        size="large"
+                        color={colours.darkSlateGrey}
+                      />
+                    ) : (
+                      "Save"
+                    )
+                  }
+                  style={createPost.chooseMediaButton}
+                  disabled={(!image && !caption) || loading}
+                  color={colours.darkSlateGrey}
+                  onPress={() => saveProfile()}
+                />
               ) : (
                 <></>
               )}
