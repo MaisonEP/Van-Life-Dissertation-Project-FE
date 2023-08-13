@@ -1,5 +1,5 @@
 import { View, StyleSheet, Image, Text, TouchableOpacity } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import Layout from "../../components/Layout";
 import {
@@ -95,6 +95,12 @@ export default function Profile({ navigation }) {
     };
     callGetUser();
   }, []);
+
+  const logout = async () => {
+    await AsyncStorage.removeItem("userId");
+    await AsyncStorage.removeItem("loggedIn");
+    context.setLoggedIn(false);
+  };
 
   return (
     <Layout>
@@ -204,6 +210,14 @@ export default function Profile({ navigation }) {
               )}
             </>
           )}
+          <Button
+            title="Log out"
+            color={colours.darkSlateGrey}
+            onPress={() => {
+              logout();
+            }}
+            style={createPost.input}
+          />
         </CampervanSurface>
       </Stack>
     </Layout>
