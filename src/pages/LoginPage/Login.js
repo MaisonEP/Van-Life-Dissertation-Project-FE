@@ -43,7 +43,6 @@ export default function Login({ navigation }) {
       })
       .then(async (response) => {
         await AsyncStorage.setItem("loggedIn", "true");
-        console.log(response.userId);
         await AsyncStorage.setItem("userId", response.userId);
         myGlobalValues.setLoggedIn(true);
       })
