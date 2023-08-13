@@ -17,7 +17,7 @@ import { useState, useEffect, useRef, useContext } from "react";
 import * as Location from "expo-location";
 import colours from "../../styles/colours";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
-import { ListItem, Divider } from "@react-native-material/core";
+import { ListItem, Divider, Snackbar } from "@react-native-material/core";
 import { Button } from "@react-native-material/core";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import LoginContext from "../../../LoginContext";
@@ -33,6 +33,7 @@ export default function App() {
   const [showCategories, setShowCategories] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
   const context = useContext(LoginContext);
   const destinationLocation = context.postLocation;
   const dimensions = Dimensions.get("window");
@@ -67,6 +68,7 @@ export default function App() {
         setIsLoading(false);
       } catch (error) {
         console.log("This is the error" + error);
+        setError("Could not get your current location");
       }
     };
     getPermissions();
@@ -81,16 +83,19 @@ export default function App() {
       });
     } catch (error) {
       console.log("My seccond error" + error);
+      setError("Could not get the location you searched for. Please try again");
     }
   };
 
   const createPostWithLocation = async () => {
     const userId = await AsyncStorage.getItem("userId").catch((e) => {
+      setError("Something went wrong. Please try again");
       return e;
     });
 
     const areaToFind = searchlocation ?? location;
     const area = await Location.reverseGeocodeAsync(areaToFind).catch((e) => {
+      setError("Could not get the location you searched for. Please try again");
       return e;
     });
     fetch("http://192.168.0.15:8080/posts/create", {
@@ -107,12 +112,13 @@ export default function App() {
       headers: { "Content-Type": "application/json" },
     })
       .then(() => {
-        setShowCategories(false);
         context.setRefetchingPosts(true);
       })
       .catch((error) => {
         console.log("There was an error", error);
+        setError("Failed to create post. Please try again");
       });
+    setShowCategories(false);
   };
 
   return isLoading ? (
@@ -378,6 +384,23 @@ export default function App() {
           color={colours.mountainBlue}
         />
       </View>
+      {error ? (
+        <Snackbar
+          message={error}
+          style={{ position: "absolute", start: 16, end: 16, bottom: 16 }}
+          action={
+            <Button
+              variant="text"
+              title="Dismiss"
+              color={colours.grassGreen}
+              compact
+              onPress={() => setError("")}
+            />
+          }
+        />
+      ) : (
+        <></>
+      )}
     </>
   );
 }

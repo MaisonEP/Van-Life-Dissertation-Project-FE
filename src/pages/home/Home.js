@@ -4,6 +4,8 @@ import {
   Stack,
   Avatar,
   ActivityIndicator,
+  Snackbar,
+  Button,
 } from "@react-native-material/core";
 import { RefreshControl, StyleSheet, Text } from "react-native";
 import FeedCard from "../../components/FeedCard";
@@ -17,6 +19,7 @@ export default function Home({ navigation }) {
   const [allPosts, setAllPosts] = useState();
   const context = useContext(LoginContext);
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState("");
 
   const image = {
     uri: "https://cdn.pixabay.com/photo/2020/01/22/15/50/illustration-4785614_1280.png",
@@ -31,6 +34,7 @@ export default function Home({ navigation }) {
       })
       .catch((error) => {
         console.log("There was an error", error);
+        setError("Failed to retrieve posts. Please try again");
       })
       .finally(() => {
         context.setRefetchingPosts(false);
@@ -57,42 +61,61 @@ export default function Home({ navigation }) {
       resizeMode="cover"
       style={postContainer.image}
     >
-      <ScrollView
-        refreshControl={
-          <RefreshControl
-            refreshing={context?.refetchingPosts}
-            onRefresh={onRefresh}
+      <>
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={context?.refetchingPosts}
+              onRefresh={onRefresh}
+            />
+          }
+        >
+          <Stack style={{ margin: 16 }} items="center" spacing={4}>
+            {allPosts?.length > 0 ? (
+              [...allPosts].reverse().map((postInfo, i) => {
+                return (
+                  <View style={postContainer.mainContainer} key={i}>
+                    <FeedCard
+                      publisherName={postInfo.user.username}
+                      postTitle={postInfo.title}
+                      postContent={postInfo.content}
+                      navigation={navigation}
+                      isLocation={postInfo.location}
+                      location={{
+                        latitude: postInfo.latitude,
+                        longitude: postInfo.longitude,
+                      }}
+                      image={postInfo?.image}
+                      profileImage={postInfo.user?.image}
+                    ></FeedCard>
+                  </View>
+                );
+              })
+            ) : (
+              <CampervanSurface>
+                <Text>You have no posts</Text>
+              </CampervanSurface>
+            )}
+          </Stack>
+        </ScrollView>
+        {error ? (
+          <Snackbar
+            message={error}
+            style={{ position: "absolute", start: 16, end: 16, bottom: 16 }}
+            action={
+              <Button
+                variant="text"
+                title="Dismiss"
+                color={colours.grassGreen}
+                compact
+                onPress={() => setError("")}
+              />
+            }
           />
-        }
-      >
-        <Stack style={{ margin: 16 }} items="center" spacing={4}>
-          {allPosts?.length > 0 ? (
-            [...allPosts].reverse().map((postInfo, i) => {
-              return (
-                <View style={postContainer.mainContainer} key={i}>
-                  <FeedCard
-                    publisherName={postInfo.user.username}
-                    postTitle={postInfo.title}
-                    postContent={postInfo.content}
-                    navigation={navigation}
-                    isLocation={postInfo.location}
-                    location={{
-                      latitude: postInfo.latitude,
-                      longitude: postInfo.longitude,
-                    }}
-                    image={postInfo?.image}
-                    profileImage={postInfo.user?.image}
-                  ></FeedCard>
-                </View>
-              );
-            })
-          ) : (
-            <CampervanSurface>
-              <Text>You have no posts</Text>
-            </CampervanSurface>
-          )}
-        </Stack>
-      </ScrollView>
+        ) : (
+          <></>
+        )}
+      </>
     </ImageBackground>
   );
 }

@@ -5,6 +5,7 @@ import Layout from "../../components/Layout";
 import {
   ActivityIndicator,
   Button,
+  Snackbar,
   Stack,
   TextInput,
 } from "@react-native-material/core";
@@ -22,6 +23,7 @@ export default function Post({ navigation }) {
   const [caption, setCaption] = useState("");
   const context = useContext(LoginContext);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const chooseMedia = async () => {
     try {
@@ -41,7 +43,7 @@ export default function Post({ navigation }) {
         }
       }
     } catch (error) {
-      console.log(error);
+      setError("Something went selecting your image. Please try again");
     }
   };
 
@@ -70,7 +72,7 @@ export default function Post({ navigation }) {
         navigation.navigate("HomeWrapper");
       })
       .catch((error) => {
-        console.log("There was an error", error);
+        setError("Failed to create post. Please try again");
       })
       .finally(() => {
         setLoading(false);
@@ -79,56 +81,78 @@ export default function Post({ navigation }) {
 
   return (
     <Layout>
-      <Stack fill center spacing={4}>
-        <CampervanSurface>
-          <Button
-            onPress={chooseMedia}
-            title="Choose Image"
-            style={createPost.chooseMediaButton}
-            color={colours.darkSlateGrey}
-          ></Button>
-          {image && (
-            <>
-              <Image
-                source={{ uri: image.uri }}
-                style={{ width: 200, height: 200, marginBottom: 20 }}
-              />
-              <Button
-                title="Remove image"
-                style={createPost.chooseMediaButton}
-                color={colours.grassGreen}
-                trailing={() => <Icon name="close-box-outline" size={20} />}
-                onPress={() => {
-                  setImage(undefined);
-                }}
-              />
-            </>
-          )}
+      <>
+        <Stack fill center spacing={4}>
+          <CampervanSurface>
+            <Button
+              onPress={chooseMedia}
+              title="Choose Image"
+              style={createPost.chooseMediaButton}
+              color={colours.darkSlateGrey}
+            ></Button>
+            {image && (
+              <>
+                <Image
+                  source={{ uri: image.uri }}
+                  style={{ width: 200, height: 200, marginBottom: 20 }}
+                />
+                <Button
+                  title="Remove image"
+                  style={createPost.chooseMediaButton}
+                  color={colours.grassGreen}
+                  trailing={() => <Icon name="close-box-outline" size={20} />}
+                  onPress={() => {
+                    setImage(undefined);
+                  }}
+                />
+              </>
+            )}
 
-          <TextInput
-            blurOnSubmit
-            placeholder="Caption (Optional)"
-            variant="outlined"
-            style={{ ...createPost.input, marginBottom: 10 }}
-            onChangeText={(text) => {
-              setCaption(text);
-            }}
-          />
-          <Button
-            title={
-              loading ? (
-                <ActivityIndicator size="large" color={colours.darkSlateGrey} />
-              ) : (
-                "Post"
-              )
+            <TextInput
+              blurOnSubmit
+              placeholder="Caption (Optional)"
+              variant="outlined"
+              style={{ ...createPost.input, marginBottom: 10 }}
+              onChangeText={(text) => {
+                setCaption(text);
+              }}
+            />
+            <Button
+              title={
+                loading ? (
+                  <ActivityIndicator
+                    size="large"
+                    color={colours.darkSlateGrey}
+                  />
+                ) : (
+                  "Post"
+                )
+              }
+              style={createPost.chooseMediaButton}
+              disabled={!image || loading}
+              color={colours.darkSlateGrey}
+              onPress={() => createMediaPost()}
+            />
+          </CampervanSurface>
+        </Stack>
+        {error ? (
+          <Snackbar
+            message={error}
+            style={{ position: "absolute", start: 16, end: 16, bottom: 16 }}
+            action={
+              <Button
+                variant="text"
+                title="Dismiss"
+                color={colours.grassGreen}
+                compact
+                onPress={() => setError("")}
+              />
             }
-            style={createPost.chooseMediaButton}
-            disabled={!image || loading}
-            color={colours.darkSlateGrey}
-            onPress={() => createMediaPost()}
           />
-        </CampervanSurface>
-      </Stack>
+        ) : (
+          <></>
+        )}
+      </>
     </Layout>
   );
 }
