@@ -1,12 +1,15 @@
 import { StyleSheet, View } from "react-native";
 import { Surface } from "react-native-paper";
 
-export default function CampervanSurface({ children }) {
+export default function CampervanSurface({ children, fullWidth }) {
   return (
     <Surface
       elevation={2}
       category="medium"
-      style={campervanSurfaceStyle.surface}
+      style={{
+        ...campervanSurfaceStyle.surface,
+        width: fullWidth ? "100%" : "80%",
+      }}
     >
       <View style={campervanSurfaceStyle.inputContainer}>{children}</View>
     </Surface>
@@ -15,10 +18,12 @@ export default function CampervanSurface({ children }) {
 
 const campervanSurfaceStyle = StyleSheet.create({
   surface: {
-    width: "80%",
+    width: "100%",
     display: "flex",
     flexDirection: "column",
     borderRadius: "30%",
+    marginBottom: 30,
+    marginTop: 30,
   },
   inputContainer: {
     width: "100%",

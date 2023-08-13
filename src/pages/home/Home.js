@@ -5,12 +5,13 @@ import {
   Avatar,
   ActivityIndicator,
 } from "@react-native-material/core";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Text } from "react-native";
 import FeedCard from "../../components/FeedCard";
 import { ScrollView, View, ImageBackground } from "react-native";
 import { useContext, useEffect, useState } from "react";
 import LoginContext from "../../../LoginContext";
 import colours from "../../styles/colours";
+import CampervanSurface from "../../components/CampervanSurface";
 
 export default function Home({ navigation }) {
   const [allPosts, setAllPosts] = useState();
@@ -55,7 +56,7 @@ export default function Home({ navigation }) {
           <></>
         )}
         <Stack style={{ margin: 16 }} items="center" spacing={4}>
-          {allPosts ? (
+          {allPosts?.length > 0 ? (
             [...allPosts].reverse().map((postInfo, i) => {
               return (
                 <View style={postContainer.mainContainer} key={i}>
@@ -75,7 +76,9 @@ export default function Home({ navigation }) {
               );
             })
           ) : (
-            <></>
+            <CampervanSurface>
+              <Text>You have no posts</Text>
+            </CampervanSurface>
           )}
         </Stack>
       </ScrollView>

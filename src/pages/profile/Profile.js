@@ -94,7 +94,7 @@ export default function Profile({ navigation }) {
     };
     callGetUser();
   }, []);
-  console.log(caption || user.bio);
+
   return (
     <Layout>
       <Stack fill center spacing={4}>
@@ -118,7 +118,7 @@ export default function Profile({ navigation }) {
               >
                 <Avatar
                   image={
-                    image ?? user.image
+                    image ?? user?.image
                       ? {
                           uri:
                             image?.uri ?? `data:image/jpg;base64,${user.image}`,
@@ -158,13 +158,13 @@ export default function Profile({ navigation }) {
 
               <TextInput
                 blurOnSubmit
-                placeholder="Caption (Optional)"
+                placeholder="Bio (Optional)"
                 variant="outlined"
                 style={{ ...createPost.input, marginBottom: 10 }}
                 onChangeText={(text) => {
                   setCaption(text);
                 }}
-                value={caption || user.bio}
+                value={caption || user?.bio}
               />
               {image ? (
                 <>
