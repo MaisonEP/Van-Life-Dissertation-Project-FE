@@ -65,6 +65,7 @@ export default function Profile({ navigation }) {
       .then(() => {
         setUser({ image: image.base64 });
         setImage(undefined);
+        context.setRefetchingPosts(true);
       })
       .catch((error) => {
         console.log("There was an error", error);

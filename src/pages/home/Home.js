@@ -5,10 +5,10 @@ import {
   Avatar,
   ActivityIndicator,
 } from "@react-native-material/core";
-import { StyleSheet, Text } from "react-native";
+import { RefreshControl, StyleSheet, Text } from "react-native";
 import FeedCard from "../../components/FeedCard";
 import { ScrollView, View, ImageBackground } from "react-native";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import LoginContext from "../../../LoginContext";
 import colours from "../../styles/colours";
 import CampervanSurface from "../../components/CampervanSurface";
@@ -16,28 +16,40 @@ import CampervanSurface from "../../components/CampervanSurface";
 export default function Home({ navigation }) {
   const [allPosts, setAllPosts] = useState();
   const context = useContext(LoginContext);
+  const [refreshing, setRefreshing] = useState(false);
 
   const image = {
     uri: "https://cdn.pixabay.com/photo/2020/01/22/15/50/illustration-4785614_1280.png",
   };
+  const fetchPosts = () => {
+    fetch("http://192.168.0.15:8080/posts")
+      .then((response) => {
+        return response.json();
+      })
+      .then((r) => {
+        setAllPosts(r);
+      })
+      .catch((error) => {
+        console.log("There was an error", error);
+      })
+      .finally(() => {
+        context.setRefetchingPosts(false);
+      });
+  };
 
   useEffect(() => {
     if (context.refetchingPosts) {
-      fetch("http://192.168.0.15:8080/posts")
-        .then((response) => {
-          return response.json();
-        })
-        .then((r) => {
-          setAllPosts(r);
-        })
-        .catch((error) => {
-          console.log("There was an error", error);
-        })
-        .finally(() => {
-          context.setRefetchingPosts(false);
-        });
+      fetchPosts();
     }
   }, [context?.refetchingPosts]);
+
+  useEffect(() => {
+    context.setRefetchingPosts(true);
+  }, []);
+
+  const onRefresh = useCallback(() => {
+    context.setRefetchingPosts(true);
+  }, []);
 
   return (
     <ImageBackground
@@ -45,16 +57,14 @@ export default function Home({ navigation }) {
       resizeMode="cover"
       style={postContainer.image}
     >
-      <ScrollView>
-        {context.refetchingPosts ? (
-          <ActivityIndicator
-            style={{ marginTop: 30 }}
-            size="large"
-            color={colours.darkSlateGrey}
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={context?.refetchingPosts}
+            onRefresh={onRefresh}
           />
-        ) : (
-          <></>
-        )}
+        }
+      >
         <Stack style={{ margin: 16 }} items="center" spacing={4}>
           {allPosts?.length > 0 ? (
             [...allPosts].reverse().map((postInfo, i) => {

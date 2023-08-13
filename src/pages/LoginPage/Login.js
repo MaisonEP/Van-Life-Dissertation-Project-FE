@@ -3,6 +3,7 @@ import {
   IconButton,
   Button,
   Stack,
+  ActivityIndicator,
 } from "@react-native-material/core";
 import { ImageBackground, Keyboard, StyleSheet, View } from "react-native";
 import React, { useContext, useState } from "react";
@@ -21,6 +22,7 @@ export default function Login({ navigation }) {
   const [password, setPassword] = useState("");
   const [usernameError, setuserNameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const myGlobalValues = useContext(LoginContext);
   const [passwordVisibility, setPasswordVisibility] = useState(true);
@@ -33,6 +35,7 @@ export default function Login({ navigation }) {
   //JSON object has a method called stringify which takes the object containing username and password.
 
   const userCredentials = () => {
+    setLoading(true);
     fetch("http://192.168.0.15:8080/accountdetails/verifieduser", {
       method: "POST",
       body: JSON.stringify({ userName: username, password: password }),
@@ -48,6 +51,9 @@ export default function Login({ navigation }) {
       })
       .catch((error) => {
         console.log("There was an error", error);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
   return (
@@ -107,8 +113,19 @@ export default function Login({ navigation }) {
           />
           <View style={{ paddingBottom: 10, paddingTop: 30 }}>
             <Button
-              disabled={username === "" || password === ""}
-              title="Login"
+              disabled={username === "" || password === "" || loading}
+              title={
+                loading ? (
+                  <View style={{ width: "100%" }}>
+                    <ActivityIndicator
+                      size="large"
+                      color={colours.darkSlateGrey}
+                    />
+                  </View>
+                ) : (
+                  "Login"
+                )
+              }
               color={colours.grassGreen}
               tintColor={colours.white}
               // the on press attribute takes a function which calls the function for executing the http protocol and posting user credentials to the database
@@ -120,6 +137,7 @@ export default function Login({ navigation }) {
           </View>
 
           <Button
+            disabled={loading}
             color={colours.mountainBlue}
             tintColor={colours.white}
             title="Register Here"

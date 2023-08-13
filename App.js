@@ -79,8 +79,6 @@ export default function App() {
 
   useEffect(() => {
     const value = async () => {
-      const od = await AsyncStorage.getItem("userId");
-      console.log(od);
       // await AsyncStorage.clear();
       const response = await AsyncStorage.getItem("loggedIn").catch(() =>
         console.log("There was an issue getting the user id")
