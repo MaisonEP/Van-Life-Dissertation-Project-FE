@@ -6,7 +6,14 @@ import {
   ActivityIndicator,
   Snackbar,
 } from "@react-native-material/core";
-import { ImageBackground, Keyboard, StyleSheet, View } from "react-native";
+import {
+  Dimensions,
+  ImageBackground,
+  Keyboard,
+  KeyboardAvoidingView,
+  StyleSheet,
+  View,
+} from "react-native";
 import React, { useContext, useState } from "react";
 import { Surface } from "react-native-paper";
 import LoginContext from "../../../LoginContext";
@@ -60,113 +67,119 @@ export default function Login({ navigation }) {
   };
   return (
     <Layout>
-      <>
-        <Stack fill center spacing={4}>
-          <CampervanSurface>
-            <TextInput
-              blurOnSubmit
-              placeholder="Username"
-              variant="outlined"
-              onChangeText={(text) => {
-                setuserName(text.trim());
-              }}
-              style={{ ...loginStyle.input, marginBottom: 10 }}
-              onBlur={(e) => {
-                const text = e.nativeEvent.text;
-                if (text === "") {
-                  setuserNameError("The username is required");
-                } else {
-                  setuserNameError("");
-                }
-              }}
-              helperText={usernameError !== "" ? usernameError : undefined}
-              inputStyle={usernameError !== "" ? loginStyle.errorField : {}}
-            />
-            <TextInput
-              placeholder="Password"
-              variant="outlined"
-              secureTextEntry={passwordVisibility}
-              trailing={(props) => (
-                <TouchableOpacity onPress={passwordView}>
-                  {!passwordVisibility ? (
-                    <Entypo name="eye" size={20} color={colours.black} />
-                  ) : (
-                    <Entypo
-                      name="eye-with-line"
-                      size={20}
-                      color={colours.black}
-                    />
-                  )}
-                </TouchableOpacity>
-              )}
-              onChangeText={(text) => {
-                setPassword(text);
-              }}
-              style={loginStyle.input}
-              onBlur={(e) => {
-                const text = e.nativeEvent.text;
-                if (text === "") {
-                  setPasswordError("The password is required");
-                } else {
-                  setPasswordError("");
-                }
-              }}
-              helperText={passwordError !== "" ? passwordError : undefined}
-              inputStyle={passwordError !== "" ? loginStyle.errorField : {}}
-            />
-            <View style={{ paddingBottom: 10, paddingTop: 30 }}>
-              <Button
-                disabled={username === "" || password === "" || loading}
-                title={
-                  loading ? (
-                    <View style={{ width: "100%" }}>
-                      <ActivityIndicator
-                        size="large"
-                        color={colours.darkSlateGrey}
-                      />
-                    </View>
-                  ) : (
-                    "Login"
-                  )
-                }
-                color={colours.grassGreen}
-                tintColor={colours.white}
-                // the on press attribute takes a function which calls the function for executing the http protocol and posting user credentials to the database
-                onPress={() => {
-                  userCredentials();
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Dimensions.get("window").height / 10}
+        style={{ flex: 1, flexDirection: "column", justifyContent: "center" }}
+      >
+        <>
+          <Stack fill center spacing={4}>
+            <CampervanSurface>
+              <TextInput
+                blurOnSubmit
+                placeholder="Username"
+                variant="outlined"
+                onChangeText={(text) => {
+                  setuserName(text.trim());
                 }}
-                titleStyle={loginStyle.buttons}
+                style={{ ...loginStyle.input, marginBottom: 10 }}
+                onBlur={(e) => {
+                  const text = e.nativeEvent.text;
+                  if (text === "") {
+                    setuserNameError("The username is required");
+                  } else {
+                    setuserNameError("");
+                  }
+                }}
+                helperText={usernameError !== "" ? usernameError : undefined}
+                inputStyle={usernameError !== "" ? loginStyle.errorField : {}}
               />
-            </View>
+              <TextInput
+                placeholder="Password"
+                variant="outlined"
+                secureTextEntry={passwordVisibility}
+                trailing={(props) => (
+                  <TouchableOpacity onPress={passwordView}>
+                    {!passwordVisibility ? (
+                      <Entypo name="eye" size={20} color={colours.black} />
+                    ) : (
+                      <Entypo
+                        name="eye-with-line"
+                        size={20}
+                        color={colours.black}
+                      />
+                    )}
+                  </TouchableOpacity>
+                )}
+                onChangeText={(text) => {
+                  setPassword(text);
+                }}
+                style={loginStyle.input}
+                onBlur={(e) => {
+                  const text = e.nativeEvent.text;
+                  if (text === "") {
+                    setPasswordError("The password is required");
+                  } else {
+                    setPasswordError("");
+                  }
+                }}
+                helperText={passwordError !== "" ? passwordError : undefined}
+                inputStyle={passwordError !== "" ? loginStyle.errorField : {}}
+              />
+              <View style={{ paddingBottom: 10, paddingTop: 30 }}>
+                <Button
+                  disabled={username === "" || password === "" || loading}
+                  title={
+                    loading ? (
+                      <View style={{ width: "100%" }}>
+                        <ActivityIndicator
+                          size="large"
+                          color={colours.darkSlateGrey}
+                        />
+                      </View>
+                    ) : (
+                      "Login"
+                    )
+                  }
+                  color={colours.grassGreen}
+                  tintColor={colours.white}
+                  // the on press attribute takes a function which calls the function for executing the http protocol and posting user credentials to the database
+                  onPress={() => {
+                    userCredentials();
+                  }}
+                  titleStyle={loginStyle.buttons}
+                />
+              </View>
 
-            <Button
-              disabled={loading}
-              color={colours.mountainBlue}
-              tintColor={colours.white}
-              title="Register Here"
-              onPress={() => navigation.navigate("Register")}
-              titleStyle={loginStyle.buttons}
-            ></Button>
-          </CampervanSurface>
-        </Stack>
-        {error ? (
-          <Snackbar
-            message={error}
-            style={{ position: "absolute", start: 16, end: 16, bottom: 16 }}
-            action={
               <Button
-                variant="text"
-                title="Dismiss"
-                color={colours.grassGreen}
-                compact
-                onPress={() => setError("")}
-              />
-            }
-          />
-        ) : (
-          <></>
-        )}
-      </>
+                disabled={loading}
+                color={colours.mountainBlue}
+                tintColor={colours.white}
+                title="Register Here"
+                onPress={() => navigation.navigate("Register")}
+                titleStyle={loginStyle.buttons}
+              ></Button>
+            </CampervanSurface>
+          </Stack>
+          {error ? (
+            <Snackbar
+              message={error}
+              style={{ position: "absolute", start: 16, end: 16, bottom: 16 }}
+              action={
+                <Button
+                  variant="text"
+                  title="Dismiss"
+                  color={colours.grassGreen}
+                  compact
+                  onPress={() => setError("")}
+                />
+              }
+            />
+          ) : (
+            <></>
+          )}
+        </>
+      </KeyboardAvoidingView>
     </Layout>
   );
 }

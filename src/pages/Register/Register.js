@@ -6,7 +6,14 @@ import {
   ActivityIndicator,
   Snackbar,
 } from "@react-native-material/core";
-import { ImageBackground, StyleSheet, Text, View } from "react-native";
+import {
+  Dimensions,
+  ImageBackground,
+  KeyboardAvoidingView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import colours from "../../styles/colours";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import React, { useState, useContext } from "react";
@@ -68,9 +75,13 @@ export default function Register({}) {
     })
       .then(async (response) => {
         if (response.status === 200) {
-          await AsyncStorage.setItem("loggedIn", response.toString());
-          myGlobalValues.setLoggedIn(response);
+          await AsyncStorage.setItem("loggedIn", "true");
+          myGlobalValues.setLoggedIn(true);
         }
+        return response.json();
+      })
+      .then(async (r) => {
+        await AsyncStorage.setItem("userId", r.toString());
       })
       .catch((error) => {
         setError("There was a problem registering. Please try again");
@@ -82,174 +93,184 @@ export default function Register({}) {
 
   return (
     <Layout>
-      <React.Fragment>
-        <Stack fill center spacing={4} style={loginSurface.stack}>
-          <CampervanSurface>
-            <View style={{ width: "100%", paddingBottom: 30 }}>
-              <TextInput
-                style={{
-                  ...loginSurface.topfields,
-                }}
-                inputStyle={emailError !== "" ? loginSurface.errorField : {}}
-                placeholder="Email"
-                variant="outlined"
-                onChangeText={(text) => {
-                  setEmail(text);
-                }}
-                onBlur={(e) => {
-                  const text = e.nativeEvent.text;
-                  if (text === "") {
-                    setEmailError("The email is required");
-                  } else {
-                    setEmailError("");
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Dimensions.get("window").height / 10}
+        style={{ flex: 1, flexDirection: "column", justifyContent: "center" }}
+      >
+        <React.Fragment>
+          <Stack fill center spacing={4} style={loginSurface.stack}>
+            <CampervanSurface>
+              <View style={{ width: "100%", paddingBottom: 30 }}>
+                <TextInput
+                  style={{
+                    ...loginSurface.topfields,
+                  }}
+                  inputStyle={emailError !== "" ? loginSurface.errorField : {}}
+                  placeholder="Email"
+                  variant="outlined"
+                  onChangeText={(text) => {
+                    setEmail(text);
+                  }}
+                  onBlur={(e) => {
+                    const text = e.nativeEvent.text;
+                    if (text === "") {
+                      setEmailError("The email is required");
+                    } else {
+                      setEmailError("");
+                    }
+                  }}
+                  helperText={emailError !== "" ? emailError : undefined}
+                />
+                <TextInput
+                  style={loginSurface.topfields}
+                  inputStyle={
+                    usernameError !== "" ? loginSurface.errorField : {}
                   }
-                }}
-                helperText={emailError !== "" ? emailError : undefined}
-              />
-              <TextInput
-                style={loginSurface.topfields}
-                inputStyle={usernameError !== "" ? loginSurface.errorField : {}}
-                placeholder="Username"
-                variant="outlined"
-                onChangeText={(text) => {
-                  setuserName(text);
-                }}
-                onBlur={(e) => {
-                  const text = e.nativeEvent.text;
-                  if (text === "") {
-                    setUsernameError("The username is required");
-                  } else {
-                    setUsernameError("");
-                  }
-                }}
-                helperText={usernameError !== "" ? usernameError : undefined}
-              />
+                  placeholder="Username"
+                  variant="outlined"
+                  onChangeText={(text) => {
+                    setuserName(text);
+                  }}
+                  onBlur={(e) => {
+                    const text = e.nativeEvent.text;
+                    if (text === "") {
+                      setUsernameError("The username is required");
+                    } else {
+                      setUsernameError("");
+                    }
+                  }}
+                  helperText={usernameError !== "" ? usernameError : undefined}
+                />
 
-              <TextInput
-                textContentType="oneTimeCode"
-                secureTextEntry={passwordVisibility}
-                inputStyle={passwordError !== "" ? loginSurface.errorField : {}}
-                style={loginSurface.topfields}
-                placeholder="Password"
-                variant="outlined"
-                trailing={(props) => (
-                  <TouchableOpacity onPress={passwordView}>
-                    {!passwordVisibility ? (
-                      <Entypo name="eye" size={20} color={colours.black} />
-                    ) : (
-                      <Entypo
-                        name="eye-with-line"
-                        size={20}
-                        color={colours.black}
-                      />
-                    )}
-                  </TouchableOpacity>
-                )}
-                onChangeText={(text) => {
-                  setPassword(text);
-                }}
-                onBlur={(e) => {
-                  const text = e.nativeEvent.text;
-                  if (text === "") {
-                    setPasswordError("The password is required");
-                  } else {
-                    setPasswordError("");
+                <TextInput
+                  textContentType="oneTimeCode"
+                  secureTextEntry={passwordVisibility}
+                  inputStyle={
+                    passwordError !== "" ? loginSurface.errorField : {}
                   }
-                }}
-                helperText={passwordError !== "" ? passwordError : undefined}
-              />
+                  style={loginSurface.topfields}
+                  placeholder="Password"
+                  variant="outlined"
+                  trailing={(props) => (
+                    <TouchableOpacity onPress={passwordView}>
+                      {!passwordVisibility ? (
+                        <Entypo name="eye" size={20} color={colours.black} />
+                      ) : (
+                        <Entypo
+                          name="eye-with-line"
+                          size={20}
+                          color={colours.black}
+                        />
+                      )}
+                    </TouchableOpacity>
+                  )}
+                  onChangeText={(text) => {
+                    setPassword(text);
+                  }}
+                  onBlur={(e) => {
+                    const text = e.nativeEvent.text;
+                    if (text === "") {
+                      setPasswordError("The password is required");
+                    } else {
+                      setPasswordError("");
+                    }
+                  }}
+                  helperText={passwordError !== "" ? passwordError : undefined}
+                />
 
-              <TextInput
-                textContentType="oneTimeCode"
-                secureTextEntry={confirmedPasswordVisibility}
-                inputStyle={
-                  confirmedPasswordError !== "" ? loginSurface.errorField : {}
-                }
-                style={loginSurface.passwordfield}
-                placeholder="Confirm Password"
-                variant="outlined"
-                trailing={(props) => (
-                  <TouchableOpacity onPress={confirmedPasswordView}>
-                    {!confirmedPasswordVisibility ? (
-                      <Entypo name="eye" size={20} color={colours.black} />
-                    ) : (
-                      <Entypo
-                        name="eye-with-line"
-                        size={20}
-                        color={colours.black}
-                      />
-                    )}
-                  </TouchableOpacity>
-                )}
-                onChangeText={(text) => {
-                  setConfirmedPassword(text);
-                }}
-                onBlur={(e) => {
-                  const text = e.nativeEvent.text;
-                  if (text === "") {
-                    setConfirmedPasswordError(
-                      "The confirm password is required"
-                    );
-                  } else {
-                    setConfirmedPasswordError("");
+                <TextInput
+                  textContentType="oneTimeCode"
+                  secureTextEntry={confirmedPasswordVisibility}
+                  inputStyle={
+                    confirmedPasswordError !== "" ? loginSurface.errorField : {}
                   }
-                }}
-                helperText={
-                  confirmedPasswordError !== ""
-                    ? confirmedPasswordError
-                    : undefined
-                }
-              />
-              {confirmedPassword !== password &&
-                confirmedPassword !== "" &&
-                password !== "" && (
-                  <Text style={{ marginTop: 10, color: colours.red }}>
-                    Your passwords don't match
-                  </Text>
-                )}
-            </View>
-            <View style={{ width: "100%" }}>
-              <Button
-                disabled={isSubmitButtonDisabled}
-                title={
-                  loading ? (
-                    <View style={{ width: "100%" }}>
-                      <ActivityIndicator
-                        size="large"
-                        color={colours.darkSlateGrey}
-                      />
-                    </View>
-                  ) : (
-                    "Register"
-                  )
-                }
-                color={colours.mountainBlue}
-                tintColor={colours.white}
-                // the on press attribute takes a function which calls the function for executing the http protocol and posting user credentials to the database
-                onPress={() => userCredentials()}
-                style={{ width: "100%" }}
-              />
-            </View>
-          </CampervanSurface>
-        </Stack>
-        {error ? (
-          <Snackbar
-            message={error}
-            style={{ position: "absolute", start: 16, end: 16, bottom: 16 }}
-            action={
-              <Button
-                variant="text"
-                title="Dismiss"
-                color={colours.grassGreen}
-                compact
-                onPress={() => setError("")}
-              />
-            }
-          />
-        ) : (
-          <></>
-        )}
-      </React.Fragment>
+                  style={loginSurface.passwordfield}
+                  placeholder="Confirm Password"
+                  variant="outlined"
+                  trailing={(props) => (
+                    <TouchableOpacity onPress={confirmedPasswordView}>
+                      {!confirmedPasswordVisibility ? (
+                        <Entypo name="eye" size={20} color={colours.black} />
+                      ) : (
+                        <Entypo
+                          name="eye-with-line"
+                          size={20}
+                          color={colours.black}
+                        />
+                      )}
+                    </TouchableOpacity>
+                  )}
+                  onChangeText={(text) => {
+                    setConfirmedPassword(text);
+                  }}
+                  onBlur={(e) => {
+                    const text = e.nativeEvent.text;
+                    if (text === "") {
+                      setConfirmedPasswordError(
+                        "The confirm password is required"
+                      );
+                    } else {
+                      setConfirmedPasswordError("");
+                    }
+                  }}
+                  helperText={
+                    confirmedPasswordError !== ""
+                      ? confirmedPasswordError
+                      : undefined
+                  }
+                />
+                {confirmedPassword !== password &&
+                  confirmedPassword !== "" &&
+                  password !== "" && (
+                    <Text style={{ marginTop: 10, color: colours.red }}>
+                      Your passwords don't match
+                    </Text>
+                  )}
+              </View>
+              <View style={{ width: "100%" }}>
+                <Button
+                  disabled={isSubmitButtonDisabled}
+                  title={
+                    loading ? (
+                      <View style={{ width: "100%" }}>
+                        <ActivityIndicator
+                          size="large"
+                          color={colours.darkSlateGrey}
+                        />
+                      </View>
+                    ) : (
+                      "Register"
+                    )
+                  }
+                  color={colours.mountainBlue}
+                  tintColor={colours.white}
+                  // the on press attribute takes a function which calls the function for executing the http protocol and posting user credentials to the database
+                  onPress={() => userCredentials()}
+                  style={{ width: "100%" }}
+                />
+              </View>
+            </CampervanSurface>
+          </Stack>
+          {error ? (
+            <Snackbar
+              message={error}
+              style={{ position: "absolute", start: 16, end: 16, bottom: 16 }}
+              action={
+                <Button
+                  variant="text"
+                  title="Dismiss"
+                  color={colours.grassGreen}
+                  compact
+                  onPress={() => setError("")}
+                />
+              }
+            />
+          ) : (
+            <></>
+          )}
+        </React.Fragment>
+      </KeyboardAvoidingView>
     </Layout>
   );
 }

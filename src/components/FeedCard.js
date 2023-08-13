@@ -27,6 +27,7 @@ const FeedCard = ({
   location,
   image,
   profileImage,
+  postId,
 }) => {
   const viewHeight = Dimensions.get("window").height / 3;
   const context = useContext(LoginContext);
@@ -116,7 +117,10 @@ const FeedCard = ({
               </View>
               <View style={postStyle.commentLayout}>
                 <IconButton
-                  onPress={() => navigation.navigate("Comments")}
+                  onPress={() => {
+                    context.setCurrentPost(postId);
+                    navigation.navigate("Comments");
+                  }}
                   icon={(props) => (
                     <Icon
                       name="comment"
