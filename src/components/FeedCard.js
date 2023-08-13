@@ -59,7 +59,11 @@ const FeedCard = ({
           testID="here???????????????????????????????"
         >
           <View style={postStyle.displayPicture}>
-            <TouchableOpacity title="button" onPress={profileNavigate}>
+            <TouchableOpacity
+              title="button"
+              onPress={profileNavigate}
+              activeOpacity={!isLocation ? 1 : undefined}
+            >
               <Avatar
                 image={
                   profileImage

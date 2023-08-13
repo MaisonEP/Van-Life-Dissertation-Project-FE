@@ -93,7 +93,6 @@ export default function App() {
     const area = await Location.reverseGeocodeAsync(areaToFind).catch((e) => {
       return e;
     });
-    console.log("hi");
     fetch("http://192.168.0.15:8080/posts/create", {
       method: "POST",
       body: JSON.stringify({

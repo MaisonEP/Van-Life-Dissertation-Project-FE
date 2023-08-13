@@ -1,4 +1,4 @@
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView, RefreshControl } from "react-native";
 import Layout from "../../components/Layout";
 import {
   ActivityIndicator,
@@ -7,7 +7,7 @@ import {
   Stack,
   TextInput,
 } from "@react-native-material/core";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import colours from "../../styles/colours";
 import CampervanSurface from "../../components/CampervanSurface";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
@@ -17,23 +17,23 @@ export default function Search({ navigation }) {
   const [user, setUser] = useState("");
   const [allUsers, setAllUsers] = useState([]);
   const [allUsersSearch, setAllUsersSearch] = useState([]);
-
+  const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const getUsers = async () => {
-      const userId = await AsyncStorage.getItem("userId").catch((e) => {
-        return e;
-      });
+  const getUsers = async () => {
+    const userId = await AsyncStorage.getItem("userId").catch((e) => {
+      return e;
+    });
 
-      fetch("http://192.168.0.15:8080/accountdetails/allusers", {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
+    fetch("http://192.168.0.15:8080/accountdetails/allusers", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((r) => {
+        return r.json();
       })
-        .then((r) => {
-          return r.json();
-        })
-        .then((r) => {
+      .then((r) => {
+        if (r) {
           const usersWithoutSelf = r.filter((u) => {
             if (u.userId !== userId) {
               return u;
@@ -41,14 +41,23 @@ export default function Search({ navigation }) {
           });
           setAllUsers(usersWithoutSelf);
           setAllUsersSearch(usersWithoutSelf);
-        })
-        .catch((error) => {
-          console.log("There was an error", error);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    };
+        }
+      })
+      .catch((error) => {
+        console.log("There was an error", error);
+      })
+      .finally(() => {
+        setLoading(false);
+        setRefreshing(false);
+      });
+  };
+
+  useEffect(() => {
+    getUsers();
+  }, []);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
     getUsers();
   }, []);
 
@@ -76,14 +85,10 @@ export default function Search({ navigation }) {
               <TextInput
                 placeholder="Search for users here"
                 onChangeText={(text) => {
-                  console.log(text);
                   setUser(text);
                 }}
                 onBlur={() => {
                   const filteredUsers = allUsers.filter((u) => {
-                    console.log(
-                      u.username.toLowerCase().includes(user.toLowerCase())
-                    );
                     if (u.username.toLowerCase().includes(user.toLowerCase())) {
                       return u;
                     }
@@ -97,7 +102,11 @@ export default function Search({ navigation }) {
             ) : (
               <></>
             )}
-            <ScrollView>
+            <ScrollView
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+            >
               <Stack fill center spacing={4}>
                 {allUsers.length > 0 ? (
                   allUsersSearch.map((u) => (

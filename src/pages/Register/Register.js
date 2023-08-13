@@ -3,6 +3,7 @@ import {
   IconButton,
   Button,
   Stack,
+  ActivityIndicator,
 } from "@react-native-material/core";
 import { ImageBackground, StyleSheet, Text, View } from "react-native";
 import colours from "../../styles/colours";
@@ -27,6 +28,7 @@ export default function Register({}) {
   const [confirmedPassword, setConfirmedPassword] = useState("");
   const [confirmedPasswordError, setConfirmedPasswordError] = useState("");
 
+  const [loading, setLoading] = useState(false);
   const [passwordVisibility, setPasswordVisibility] = useState(true);
   const [confirmedPasswordVisibility, setConfirmedasswordVisibility] =
     useState(true);
@@ -43,7 +45,8 @@ export default function Register({}) {
     email === "" ||
     password === "" ||
     confirmedPassword === "" ||
-    password !== confirmedPassword;
+    password !== confirmedPassword ||
+    loading;
 
   const image = {
     uri: "https://cdn.pixabay.com/photo/2020/01/22/15/50/illustration-4785614_1280.png",
@@ -55,6 +58,7 @@ export default function Register({}) {
   //JSON object has a method called stringify which takes the object containing username and password.
 
   const userCredentials = () => {
+    setLoading(true);
     fetch("http://192.168.0.15:8080/accountdetails/register", {
       method: "POST",
       body: JSON.stringify({ userName: username, password: password }),
@@ -65,17 +69,18 @@ export default function Register({}) {
           await AsyncStorage.setItem("loggedIn", response.toString());
           myGlobalValues.setLoggedIn(response);
         }
-        console.log(response.status === 200);
       })
       .catch((error) => {
         console.log(
           "There was an error posting user credentials to the database",
           error
         );
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
-  console.log(confirmedPassword, password);
   return (
     <React.Fragment>
       <Layout>
@@ -204,14 +209,26 @@ export default function Register({}) {
                   </Text>
                 )}
             </View>
-            <View>
+            <View style={{ width: "100%" }}>
               <Button
                 disabled={isSubmitButtonDisabled}
-                title="Register"
+                title={
+                  loading ? (
+                    <View style={{ width: "100%" }}>
+                      <ActivityIndicator
+                        size="large"
+                        color={colours.darkSlateGrey}
+                      />
+                    </View>
+                  ) : (
+                    "Register"
+                  )
+                }
                 color={colours.mountainBlue}
                 tintColor={colours.white}
                 // the on press attribute takes a function which calls the function for executing the http protocol and posting user credentials to the database
                 onPress={() => userCredentials()}
+                style={{ width: "100%" }}
               />
             </View>
           </CampervanSurface>

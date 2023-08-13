@@ -50,7 +50,6 @@ export default function Post({ navigation }) {
     const userId = await AsyncStorage.getItem("userId").catch((e) => {
       return e;
     });
-
     fetch("http://192.168.0.15:8080/posts/create", {
       method: "POST",
       body: JSON.stringify({
@@ -92,7 +91,7 @@ export default function Post({ navigation }) {
             <>
               <Image
                 source={{ uri: image.uri }}
-                style={{ width: 200, height: 100, marginBottom: 20 }}
+                style={{ width: 200, height: 200, marginBottom: 20 }}
               />
               <Button
                 title="Remove image"
