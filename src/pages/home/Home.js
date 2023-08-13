@@ -87,6 +87,7 @@ export default function Home({ navigation }) {
                       }}
                       image={postInfo?.image}
                       profileImage={postInfo.user?.image}
+                      postId={postInfo.postId}
                     ></FeedCard>
                   </View>
                 );

@@ -59,6 +59,7 @@ export default function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [appLoading, setAppLoading] = useState(true);
   const [refetchingPosts, setRefetchingPosts] = useState(true);
+  const [currentPost, setCurrentPost] = useState();
   const [postLocation, setPostLocation] = useState();
 
   const initialContext = {
@@ -68,6 +69,8 @@ export default function App() {
     setRefetchingPosts: setRefetchingPosts,
     postLocation: postLocation,
     setPostLocation: setPostLocation,
+    currentPost: currentPost,
+    setCurrentPost: setCurrentPost,
   };
 
   useEffect(() => {
