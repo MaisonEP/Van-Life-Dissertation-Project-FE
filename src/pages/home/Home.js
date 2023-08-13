@@ -71,6 +71,7 @@ export default function Home({ navigation }) {
                       longitude: postInfo.longitude,
                     }}
                     image={postInfo?.image}
+                    profileImage={postInfo.user?.image}
                   ></FeedCard>
                 </View>
               );

@@ -25,6 +25,7 @@ const FeedCard = ({
   isLocation,
   location,
   image,
+  profileImage,
 }) => {
   const viewHeight = Dimensions.get("window").height / 3;
   const context = useContext(LoginContext);
@@ -59,7 +60,14 @@ const FeedCard = ({
         >
           <View style={postStyle.displayPicture}>
             <TouchableOpacity title="button" onPress={profileNavigate}>
-              <Avatar icon={(props) => <Icon name="account" {...props} />} />
+              <Avatar
+                image={
+                  profileImage
+                    ? { uri: `data:image/jpg;base64,${profileImage}` }
+                    : undefined
+                }
+                icon={(props) => <Icon name="account" {...props} />}
+              />
             </TouchableOpacity>
           </View>
           <View style={postStyle.usernameAndContent}>
