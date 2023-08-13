@@ -16,6 +16,7 @@ import {
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import { useContext, useState } from "react";
 import LoginContext from "../../LoginContext";
+import CampervanSurface from "./CampervanSurface";
 
 const FeedCard = ({
   publisherName,
@@ -45,17 +46,13 @@ const FeedCard = ({
         }
       }}
     >
-      <Surface
-        elevation={6}
+      <CampervanSurface
         category="medium"
-        style={{
-          ...postStyle.container,
-          minHeight: viewHeight,
-          backgroundColor: isLocation ? colours.pistachio : colours.white,
-        }}
+        fullWidth={true}
+        backgroundColor={isLocation ? colours.pistachio : colours.white}
       >
         <View
-          style={postStyle.contentLayout}
+          style={{ ...postStyle.contentLayout }}
           testID="here???????????????????????????????"
         >
           <View style={postStyle.displayPicture}>
@@ -144,7 +141,7 @@ const FeedCard = ({
             </View>
           </View>
         </View>
-      </Surface>
+      </CampervanSurface>
     </TouchableOpacity>
   );
 };
@@ -159,7 +156,6 @@ const postStyle = StyleSheet.create({
   },
   contentLayout: {
     flexDirection: "row",
-    padding: 10,
     flexGrow: 1,
   },
   contentBody: {

@@ -1,5 +1,5 @@
 import { View, StyleSheet, Image, Text, TouchableOpacity } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import Layout from "../../components/Layout";
 import {
@@ -8,6 +8,7 @@ import {
   Stack,
   TextInput,
   Avatar,
+  Snackbar,
 } from "@react-native-material/core";
 import CampervanSurface from "../../components/CampervanSurface";
 import colours from "../../styles/colours";
@@ -23,6 +24,7 @@ export default function Profile({ navigation }) {
   const context = useContext(LoginContext);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState();
+  const [error, setError] = useState("");
 
   const chooseMedia = async () => {
     try {
@@ -69,6 +71,7 @@ export default function Profile({ navigation }) {
       })
       .catch((error) => {
         console.log("There was an error", error);
+        setError("Could not update your profile. Please try again");
       })
       .finally(() => {
         setLoading(false);
@@ -91,121 +94,158 @@ export default function Profile({ navigation }) {
         })
         .catch((error) => {
           console.log("There was an error", error);
+          setError("Could not get your profile. Please try again");
         });
     };
     callGetUser();
   }, []);
 
+  const logout = async () => {
+    await AsyncStorage.removeItem("userId");
+    await AsyncStorage.removeItem("loggedIn");
+    context.setLoggedIn(false);
+  };
+
   return (
     <Layout>
-      <Stack fill center spacing={4}>
-        <CampervanSurface>
-          {!user ? (
-            <View
-              style={{
-                minHeight: 400,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <ActivityIndicator size="large" color={colours.darkSlateGrey} />
-            </View>
-          ) : (
-            <>
-              <TouchableOpacity
-                title="button"
-                onPress={chooseMedia}
-                style={{ marginBottom: 20, position: "relative" }}
-              >
-                <Avatar
-                  image={
-                    image ?? user?.image
-                      ? {
-                          uri:
-                            image?.uri ?? `data:image/jpg;base64,${user.image}`,
-                        }
-                      : undefined
-                  }
-                  icon={(props) => <Icon name="account" {...props} />}
-                  size={300}
-                  style={{
-                    borderColor: colours.darkSlateGrey,
-                    // borderWidth: 10,
-                  }}
-                />
-                <View
-                  style={{
-                    position: "absolute",
-                    bottom: "5%",
-                    left: "20%",
-                    transform: [{ translateX: -20 }],
-                    backgroundColor: colours.darkSlateGrey,
-                    width: 40,
-                    height: 40,
-                    borderRadius: "100%",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Icon
-                    name="pencil"
-                    size={30}
-                    style={{
-                      color: colours.white,
-                    }}
-                  />
-                </View>
-              </TouchableOpacity>
-
-              <TextInput
-                blurOnSubmit
-                placeholder="Bio (Optional)"
-                variant="outlined"
-                style={{ ...createPost.input, marginBottom: 10 }}
-                onChangeText={(text) => {
-                  setCaption(text);
+      <>
+        <Stack fill center spacing={4}>
+          <CampervanSurface>
+            {!user && loading ? (
+              <View
+                style={{
+                  minHeight: 400,
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
-                value={caption || user?.bio}
-              />
-              {image ? (
-                <>
-                  <Button
-                    title="Remove image"
-                    style={createPost.chooseMediaButton}
-                    color={colours.grassGreen}
-                    trailing={() => <Icon name="close-box-outline" size={20} />}
-                    onPress={() => {
-                      setImage(undefined);
+              >
+                <ActivityIndicator size="large" color={colours.darkSlateGrey} />
+              </View>
+            ) : (
+              <>
+                <TouchableOpacity
+                  title="button"
+                  onPress={chooseMedia}
+                  style={{ marginBottom: 20, position: "relative" }}
+                >
+                  <Avatar
+                    image={
+                      image ?? user?.image
+                        ? {
+                            uri:
+                              image?.uri ??
+                              `data:image/jpg;base64,${user.image}`,
+                          }
+                        : undefined
+                    }
+                    icon={(props) => <Icon name="account" {...props} />}
+                    size={300}
+                    style={{
+                      borderColor: colours.darkSlateGrey,
+                      // borderWidth: 10,
                     }}
                   />
-                </>
-              ) : (
-                <></>
-              )}
-              {image || caption ? (
-                <Button
-                  title={
-                    loading ? (
-                      <ActivityIndicator
-                        size="large"
-                        color={colours.darkSlateGrey}
-                      />
-                    ) : (
-                      "Save"
-                    )
-                  }
-                  style={createPost.chooseMediaButton}
-                  disabled={(!image && !caption) || loading}
-                  color={colours.darkSlateGrey}
-                  onPress={() => saveProfile()}
+                  <View
+                    style={{
+                      position: "absolute",
+                      bottom: "5%",
+                      left: "20%",
+                      transform: [{ translateX: -20 }],
+                      backgroundColor: colours.darkSlateGrey,
+                      width: 40,
+                      height: 40,
+                      borderRadius: "100%",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Icon
+                      name="pencil"
+                      size={30}
+                      style={{
+                        color: colours.white,
+                      }}
+                    />
+                  </View>
+                </TouchableOpacity>
+
+                <TextInput
+                  blurOnSubmit
+                  placeholder="Bio (Optional)"
+                  variant="outlined"
+                  style={{ ...createPost.input, marginBottom: 10 }}
+                  onChangeText={(text) => {
+                    setCaption(text);
+                  }}
+                  value={caption || user?.bio}
                 />
-              ) : (
-                <></>
-              )}
-            </>
-          )}
-        </CampervanSurface>
-      </Stack>
+                {image ? (
+                  <>
+                    <Button
+                      title="Remove image"
+                      style={createPost.chooseMediaButton}
+                      color={colours.grassGreen}
+                      trailing={() => (
+                        <Icon name="close-box-outline" size={20} />
+                      )}
+                      onPress={() => {
+                        setImage(undefined);
+                      }}
+                    />
+                  </>
+                ) : (
+                  <></>
+                )}
+                {image || caption ? (
+                  <Button
+                    title={
+                      loading ? (
+                        <ActivityIndicator
+                          size="large"
+                          color={colours.darkSlateGrey}
+                        />
+                      ) : (
+                        "Save"
+                      )
+                    }
+                    style={createPost.chooseMediaButton}
+                    disabled={(!image && !caption) || loading}
+                    color={colours.darkSlateGrey}
+                    onPress={() => saveProfile()}
+                  />
+                ) : (
+                  <></>
+                )}
+              </>
+            )}
+            <Button
+              title="Log out"
+              color={colours.darkSlateGrey}
+              onPress={() => {
+                logout();
+              }}
+              style={createPost.input}
+            />
+          </CampervanSurface>
+        </Stack>
+        {error ? (
+          <Snackbar
+            message={error}
+            style={{ position: "absolute", start: 16, end: 16, bottom: 16 }}
+            action={
+              <Button
+                variant="text"
+                title="Dismiss"
+                color={colours.grassGreen}
+                compact
+                onPress={() => setError("")}
+              />
+            }
+          />
+        ) : (
+          <></>
+        )}
+      </>
     </Layout>
   );
 }

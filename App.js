@@ -33,14 +33,7 @@ const image = {
 const Stack = createStackNavigator();
 const Tabs = createBottomTabNavigator();
 const headerStyle = HeaderStyleInterpolators;
-const Password = 1;
-const Test = () => {
-  return (
-    <View>
-      <Text> Testingggggggggggggggggggggggg</Text>
-    </View>
-  );
-};
+
 const ScreenNavigator = () => {
   return (
     <Stack.Navigator
@@ -109,9 +102,9 @@ export default function App() {
               tabBar={(props) => <AppNavBar {...props}></AppNavBar>}
             >
               <Tabs.Screen
-                name="HomeWrapper"
+                name="Home"
                 component={ScreenNavigator}
-                options={{ header: () => null }}
+                options={{ headerShown: false }}
               ></Tabs.Screen>
               <Tabs.Screen
                 name="Profile"
