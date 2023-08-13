@@ -4,6 +4,7 @@ import {
   Button,
   Stack,
   ActivityIndicator,
+  Snackbar,
 } from "@react-native-material/core";
 import { ImageBackground, StyleSheet, Text, View } from "react-native";
 import colours from "../../styles/colours";
@@ -18,6 +19,7 @@ import Layout from "../../components/Layout";
 import CampervanSurface from "../../components/CampervanSurface";
 
 export default function Register({}) {
+  const [error, setError] = useState("");
   const [username, setuserName] = useState("");
   const [usernameError, setUsernameError] = useState("");
   const [email, setEmail] = useState("");
@@ -71,10 +73,7 @@ export default function Register({}) {
         }
       })
       .catch((error) => {
-        console.log(
-          "There was an error posting user credentials to the database",
-          error
-        );
+        setError("There was a problem registering. Please try again");
       })
       .finally(() => {
         setLoading(false);
@@ -82,8 +81,8 @@ export default function Register({}) {
   };
 
   return (
-    <React.Fragment>
-      <Layout>
+    <Layout>
+      <React.Fragment>
         <Stack fill center spacing={4} style={loginSurface.stack}>
           <CampervanSurface>
             <View style={{ width: "100%", paddingBottom: 30 }}>
@@ -233,8 +232,25 @@ export default function Register({}) {
             </View>
           </CampervanSurface>
         </Stack>
-      </Layout>
-    </React.Fragment>
+        {error ? (
+          <Snackbar
+            message={error}
+            style={{ position: "absolute", start: 16, end: 16, bottom: 16 }}
+            action={
+              <Button
+                variant="text"
+                title="Dismiss"
+                color={colours.grassGreen}
+                compact
+                onPress={() => setError("")}
+              />
+            }
+          />
+        ) : (
+          <></>
+        )}
+      </React.Fragment>
+    </Layout>
   );
 }
 

@@ -33,21 +33,18 @@ const image = {
 const Stack = createStackNavigator();
 const Tabs = createBottomTabNavigator();
 const headerStyle = HeaderStyleInterpolators;
-const Password = 1;
-const Test = () => {
-  return (
-    <View>
-      <Text> Testingggggggggggggggggggggggg</Text>
-    </View>
-  );
-};
+
 const ScreenNavigator = () => {
   return (
     <Stack.Navigator
       initialRouteName="Home"
       screenOptions={{ cardStyle: appStyle.appBackground }}
     >
-      <Stack.Screen name="Home" component={Home}></Stack.Screen>
+      <Stack.Screen
+        name="Home"
+        component={Home}
+        // options={{ header: () => null }}
+      ></Stack.Screen>
       <Stack.Screen
         name="UserProfiles"
         component={UserProfiles}
@@ -109,9 +106,9 @@ export default function App() {
               tabBar={(props) => <AppNavBar {...props}></AppNavBar>}
             >
               <Tabs.Screen
-                name="HomeWrapper"
+                name="Home"
                 component={ScreenNavigator}
-                options={{ header: () => null }}
+                options={{ headerShown: false }}
               ></Tabs.Screen>
               <Tabs.Screen
                 name="Profile"

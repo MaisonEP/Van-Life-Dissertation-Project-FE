@@ -69,7 +69,7 @@ export default function Post({ navigation }) {
       .then(() => {
         context.setRefetchingPosts(true);
         setImage(undefined);
-        navigation.navigate("HomeWrapper");
+        navigation.navigate("Home");
       })
       .catch((error) => {
         setError("Failed to create post. Please try again");
