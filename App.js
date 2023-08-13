@@ -40,11 +40,7 @@ const ScreenNavigator = () => {
       initialRouteName="Home"
       screenOptions={{ cardStyle: appStyle.appBackground }}
     >
-      <Stack.Screen
-        name="Home"
-        component={Home}
-        // options={{ header: () => null }}
-      ></Stack.Screen>
+      <Stack.Screen name="Home" component={Home}></Stack.Screen>
       <Stack.Screen
         name="UserProfiles"
         component={UserProfiles}
