@@ -45,8 +45,6 @@ export default function App() {
     other: "Other",
   };
 
-  const categoriesRef = useRef();
-
   LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
 
   const hanldeScreenClick = () => {
@@ -97,13 +95,16 @@ export default function App() {
     const area = await Location.reverseGeocodeAsync(areaToFind).catch((e) => {
       setError("Could not get the location you searched for. Please try again");
       return e;
+      s;
     });
     fetch("http://192.168.0.15:8080/posts/create", {
       method: "POST",
       body: JSON.stringify({
         userId: userId,
         title: selectedCategory,
-        content: `Location: ${area[0].street},  ${area[0].city},  ${area[0].country}`,
+        content: `Location: ${
+          Boolean(area[0].street) ? area[0].street + "," : ""
+        }  ${area[0].city},  ${area[0].country}`,
         isLocation: true,
         longitude: areaToFind.longitude,
         latitude: areaToFind.latitude,
@@ -300,7 +301,6 @@ export default function App() {
         <StatusBar style="auto" />
       </TouchableOpacity>
       <View
-        ref={categoriesRef}
         style={{
           ...mapStyle.categories,
           height: showCategories ? "auto" : 0,

@@ -102,6 +102,7 @@ export default function App() {
           {/* HTML comments like this one are created between html tags. press control + forward slash */}
           {loggedIn ? (
             <Tabs.Navigator
+              initialRouteName="Home"
               tabBar={(props) => <AppNavBar {...props}></AppNavBar>}
             >
               <Tabs.Screen

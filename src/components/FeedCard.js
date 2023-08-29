@@ -52,10 +52,7 @@ const FeedCard = ({
         fullWidth={true}
         backgroundColor={isLocation ? colours.pistachio : colours.white}
       >
-        <View
-          style={{ ...postStyle.contentLayout }}
-          testID="here???????????????????????????????"
-        >
+        <View style={{ ...postStyle.contentLayout }}>
           <View style={postStyle.displayPicture}>
             <TouchableOpacity
               title="button"
@@ -166,7 +163,7 @@ const postStyle = StyleSheet.create({
     flexGrow: 1,
     width: "100%",
   },
-  displayPicture: { paddingRight: 20 },
+  displayPicture: { paddingRight: 20, flexShrink: 1 },
   usernameAndContent: {
     flexShrink: 1,
     width: "100%",
