@@ -15,6 +15,7 @@ import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import LoginContext from "../../../LoginContext";
 import { decode, encode } from "base-64";
+import { backEndEndpoint } from "../../assets/endpoint";
 
 export default function Post({ navigation }) {
   const [image, setImage] = useState(null);
@@ -52,7 +53,8 @@ export default function Post({ navigation }) {
     const userId = await AsyncStorage.getItem("userId").catch((e) => {
       return e;
     });
-    fetch("http://192.168.0.15:8080/posts/create", {
+    console.log(userId);
+    fetch(backEndEndpoint.uri + "/posts/create", {
       method: "POST",
       body: JSON.stringify({
         userId: userId,
@@ -72,6 +74,7 @@ export default function Post({ navigation }) {
         navigation.navigate("Home");
       })
       .catch((error) => {
+        console.log(error);
         setError("Failed to create post. Please try again");
       })
       .finally(() => {

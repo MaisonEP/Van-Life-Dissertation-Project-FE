@@ -14,6 +14,7 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import LoginContext from "../../../LoginContext";
 import colours from "../../styles/colours";
 import CampervanSurface from "../../components/CampervanSurface";
+import { backEndEndpoint } from "../../assets/endpoint";
 
 export default function Home({ navigation }) {
   const [allPosts, setAllPosts] = useState();
@@ -25,7 +26,7 @@ export default function Home({ navigation }) {
     uri: "https://cdn.pixabay.com/photo/2020/01/22/15/50/illustration-4785614_1280.png",
   };
   const fetchPosts = () => {
-    fetch("http://192.168.0.15:8080/posts")
+    fetch(backEndEndpoint.uri + "/posts")
       .then((response) => {
         return response.json();
       })

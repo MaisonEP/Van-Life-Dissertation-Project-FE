@@ -14,6 +14,7 @@ import colours from "../../styles/colours";
 import CampervanSurface from "../../components/CampervanSurface";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { backEndEndpoint } from "../../assets/endpoint";
 
 export default function Search({ navigation }) {
   const [user, setUser] = useState("");
@@ -28,7 +29,7 @@ export default function Search({ navigation }) {
       return e;
     });
 
-    fetch("http://192.168.0.15:8080/accountdetails/allusers", {
+    fetch(backEndEndpoint.uri + "/accountdetails/allusers", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     })

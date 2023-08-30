@@ -23,6 +23,7 @@ import colours from "../../styles/colours";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import LoginContext from "../../../LoginContext";
+import { backEndEndpoint } from "../../assets/endpoint";
 
 export default function Profile({ navigation }) {
   const [image, setImage] = useState(null);
@@ -62,7 +63,7 @@ export default function Profile({ navigation }) {
       return e;
     });
 
-    fetch("http://192.168.0.15:8080/accountdetails/profile", {
+    fetch(backEndEndpoint.uri + "/accountdetails/profile", {
       method: "PATCH",
       body: JSON.stringify({
         userId: userId,
@@ -91,7 +92,7 @@ export default function Profile({ navigation }) {
       const userId = await AsyncStorage.getItem("userId").catch((e) => {
         return e;
       });
-      fetch(`http://192.168.0.15:8080/accountdetails/allusers/${userId}`, {
+      fetch(backEndEndpoint.uri + `/accountdetails/allusers/${userId}`, {
         method: "GET",
       })
         .then((r) => {

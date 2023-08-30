@@ -24,6 +24,7 @@ import LoginContext from "../../../LoginContext";
 import { API_KEY_GOOGLE } from "../../config/config";
 import redPin from "../../assets/images/red-pin.png";
 import bluePin from "../../assets/images/blue-pin.png";
+import { backEndEndpoint } from "../../assets/endpoint";
 
 export default function App() {
   const [location, setLocation] = useState();
@@ -97,7 +98,7 @@ export default function App() {
       return e;
       s;
     });
-    fetch("http://192.168.0.15:8080/posts/create", {
+    fetch(backEndEndpoint.uri + "/posts/create", {
       method: "POST",
       body: JSON.stringify({
         userId: userId,

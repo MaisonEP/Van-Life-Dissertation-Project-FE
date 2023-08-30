@@ -24,6 +24,7 @@ import CampervanSurface from "../../components/CampervanSurface";
 import colours from "../../styles/colours";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Entypo } from "@expo/vector-icons";
+import { backEndEndpoint } from "../../assets/endpoint";
 
 export default function Login({ navigation }) {
   const [username, setuserName] = useState("");
@@ -45,7 +46,7 @@ export default function Login({ navigation }) {
 
   const userCredentials = () => {
     setLoading(true);
-    fetch("http://192.168.0.15:8080/accountdetails/verifieduser", {
+    fetch(backEndEndpoint.uri + "/accountdetails/verifieduser", {
       method: "POST",
       body: JSON.stringify({ userName: username, password: password }),
       headers: { "Content-Type": "application/json" },

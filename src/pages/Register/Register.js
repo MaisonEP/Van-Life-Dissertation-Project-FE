@@ -24,6 +24,7 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { Entypo } from "@expo/vector-icons";
 import Layout from "../../components/Layout";
 import CampervanSurface from "../../components/CampervanSurface";
+import { backEndEndpoint } from "../../assets/endpoint";
 
 export default function Register({}) {
   const [error, setError] = useState("");
@@ -67,8 +68,9 @@ export default function Register({}) {
   //JSON object has a method called stringify which takes the object containing username and password.
 
   const userCredentials = () => {
+    console.log(backEndEndpoint.uri + "/accountdetails/register");
     setLoading(true);
-    fetch("http://192.168.0.15:8080/accountdetails/register", {
+    fetch(backEndEndpoint.uri + "/accountdetails/register", {
       method: "POST",
       body: JSON.stringify({ userName: username, password: password }),
       headers: { "Content-Type": "application/json" },
@@ -84,6 +86,7 @@ export default function Register({}) {
         await AsyncStorage.setItem("userId", r.toString());
       })
       .catch((error) => {
+        console.log(error);
         setError("There was a problem registering. Please try again");
       })
       .finally(() => {

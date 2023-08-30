@@ -7,6 +7,9 @@ import {
   RefreshControl,
   KeyboardAvoidingView,
   Dimensions,
+  SafeAreaView,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 import Layout from "../../components/Layout";
 import { useContext, useEffect, useState } from "react";
@@ -21,6 +24,8 @@ import {
 } from "@react-native-material/core";
 import colours from "../../styles/colours";
 import { format } from "date-fns";
+import { backEndEndpoint } from "../../assets/endpoint";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function UserProfiles({ navigation }) {
   const context = useContext(LoginContext);
@@ -29,15 +34,29 @@ export default function UserProfiles({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const [creatingComment, setCreatingComment] = useState(false);
   const [error, setError] = useState("");
+  const [keyboardStatus, setKeyboardStatus] = useState(false);
+
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
+      setKeyboardStatus(true);
+    });
+    const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardStatus(false);
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  });
 
   const fetchComments = () => {
     setRefreshing(true);
-    fetch(`http://192.168.0.15:8080/posts/comment/${context.currentPost}`)
+    fetch(backEndEndpoint.uri + `/posts/comment/${context.currentPost}`)
       .then((response) => {
         return response.json();
       })
       .then((allComments) => {
-        console.log(allComments);
         setComments(allComments);
       })
       .catch(() => {
@@ -53,13 +72,17 @@ export default function UserProfiles({ navigation }) {
     fetchComments();
   }, [context.currentPost]);
 
-  const createComment = () => {
+  const createComment = async () => {
     setCreatingComment(true);
-    fetch("http://192.168.0.15:8080/posts/comment", {
+    const userId = await AsyncStorage.getItem("userId").catch((e) => {
+      return e;
+    });
+    fetch(backEndEndpoint.uri + "/posts/comment", {
       method: "POST",
       body: JSON.stringify({
         comment: text,
         postId: context.currentPost,
+        userId: userId,
       }),
       headers: { "Content-Type": "application/json" },
     })
@@ -76,26 +99,31 @@ export default function UserProfiles({ navigation }) {
       });
   };
 
-  console.log(Dimensions.get("screen").height / 10);
   return (
     <Layout>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Dimensions.get("window").height / 10}
-        style={{ flex: 1, flexDirection: "column", justifyContent: "center" }}
+      <ScrollView
+        automaticallyAdjustKeyboardInsets
+        scrollEnabled={false}
+        contentContainerStyle={{
+          height: Dimensions.get("screen").height,
+          flexShrink: 1,
+        }}
       >
-        <>
-          <ScrollView
-            contentContainerStyle={{ alignItems: "center", flexShrink: 2 }}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={() => {
-                  fetchComments();
-                }}
-              />
-            }
-          >
+        <ScrollView
+          contentContainerStyle={{
+            alignItems: "center",
+            paddingBottom: 20,
+          }}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => {
+                fetchComments();
+              }}
+            />
+          }
+        >
+          <>
             {comments.length > 0 ? (
               [...comments].reverse().map((comment) => {
                 return (
@@ -107,7 +135,11 @@ export default function UserProfiles({ navigation }) {
                       {format(new Date(comment.timeDate), "dd-MM-yyyy HH:mm")}
                     </Text>
                     <Divider
-                      style={{ width: "100%", marginTop: 10, marginBottom: 10 }}
+                      style={{
+                        width: "100%",
+                        marginTop: 10,
+                        marginBottom: 10,
+                      }}
                     />
                     <Text>{comment.comment}</Text>
                   </CampervanSurface>
@@ -116,55 +148,55 @@ export default function UserProfiles({ navigation }) {
             ) : (
               <></>
             )}
-          </ScrollView>
-          <View style={{ padding: 30, width: "100%" }}>
-            <TextInput
-              placeholder="Add comment"
-              style={commentSectionContainer.container}
-              variant="outlined"
-              onChangeText={(inputText) => setText(inputText)}
-              value={text}
-              blurOnSubmit
-            />
+          </>
+        </ScrollView>
+        <View style={{ padding: 30, width: "100%" }}>
+          <TextInput
+            placeholder="Add comment"
+            style={commentSectionContainer.container}
+            variant="outlined"
+            onChangeText={(inputText) => setText(inputText)}
+            value={text}
+            blurOnSubmit
+          />
 
-            <Button
-              title={
-                creatingComment ? (
-                  <View style={{ width: "100%" }}>
-                    <ActivityIndicator
-                      size="large"
-                      color={colours.darkSlateGrey}
-                    />
-                  </View>
-                ) : (
-                  "Comment"
-                )
-              }
-              style={{ ...commentSectionContainer.container, marginTop: 20 }}
-              color={colours.grassGreen}
-              onPress={() => createComment()}
-              disabled={!text || creatingComment}
-            />
-          </View>
-          {error ? (
-            <Snackbar
-              message={error}
-              style={{ position: "absolute", start: 16, end: 16, bottom: 16 }}
-              action={
-                <Button
-                  variant="text"
-                  title="Dismiss"
-                  color={colours.grassGreen}
-                  compact
-                  onPress={() => setError("")}
-                />
-              }
-            />
-          ) : (
-            <></>
-          )}
-        </>
-      </KeyboardAvoidingView>
+          <Button
+            title={
+              creatingComment ? (
+                <View style={{ width: "100%" }}>
+                  <ActivityIndicator
+                    size="large"
+                    color={colours.darkSlateGrey}
+                  />
+                </View>
+              ) : (
+                "Comment"
+              )
+            }
+            style={{ ...commentSectionContainer.container, marginTop: 20 }}
+            color={colours.grassGreen}
+            onPress={() => createComment()}
+            disabled={!text || creatingComment}
+          />
+        </View>
+        {error ? (
+          <Snackbar
+            message={error}
+            style={{ position: "absolute", start: 16, end: 16, bottom: 16 }}
+            action={
+              <Button
+                variant="text"
+                title="Dismiss"
+                color={colours.grassGreen}
+                compact
+                onPress={() => setError("")}
+              />
+            }
+          />
+        ) : (
+          <></>
+        )}
+      </ScrollView>
     </Layout>
   );
 }
